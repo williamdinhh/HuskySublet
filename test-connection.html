@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Connection</title>
+</head>
+<body>
+    <h1>Test API Connection</h1>
+    <button onclick="testSignup()">Test Signup</button>
+    <pre id="result"></pre>
+    
+    <script>
+        async function testSignup() {
+            const result = document.getElementById('result');
+            result.textContent = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test' + Date.now() + '@test.com',
+                        password: 'password123',
+                        name: 'Test User'
+                    })
+                });
+                
+                const data = await response.json();
+                result.textContent = `Status: ${response.status}\n\nResponse:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                result.textContent = `Error: ${error.message}\n\nStack: ${error.stack}`;
+            }
+        }
+    </script>
+</body>
+</html>

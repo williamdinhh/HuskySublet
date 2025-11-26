@@ -1,55 +1,129 @@
 # 🐺 HuskySublet
 
-A Hinge-style web app for UW students to swipe through and save sublet listings.
+A Hinge-style web app for UW students to find sublets and match with roommates.
 
-## Features
+## ✨ Features
 
-- **Hinge-style card interface**: Swipe through one sublet at a time
-- **Smart filters**: Price range, neighborhood, and vibe tags
-- **Pass or Interested**: Simple actions to move through listings
-- **Email reveal**: Contact info shown only when you're interested
-- **Saved listings**: Keep track of sublets you like
-- **No authentication needed**: All data lives in memory
+### Current Features
+- **User Authentication**: Sign up, log in with secure JWT tokens
+- **User Preferences**: Set your housing preferences (price range, roommates, locations)
+- **Hinge-style Card Interface**: Swipe through one sublet at a time
+- **Smart Filters**: Price range, neighborhood, and vibe tags
+- **Like/Pass System**: Like listings you're interested in
+- **Mutual Matching**: When both users like each other's listings, they match!
+- **Saved Listings**: Keep track of sublets you like
+- **Database Storage**: All data stored in MongoDB
+- **Beautiful UI**: Hinge-inspired minimalist design
 
-## Tech Stack
+### Coming Soon
+- Listing creation UI
+- Matches view and chat interface
+- Real-time messaging
+- Image upload
 
+## 🛠️ Tech Stack
+
+### Frontend
 - React 18 + TypeScript
+- React Router for navigation
 - Vite (fast build tool)
-- CSS with Husky colors (Purple & Gold)
-- Functional components with hooks
+- Hinge-inspired CSS design
 
-## Quick Start
+### Backend
+- Node.js + Express
+- MongoDB with Mongoose
+- JWT authentication
+- Socket.IO for real-time chat (ready)
 
-```bash
-# Install dependencies
-npm install
+## 🚀 Quick Start
 
-# Run development server
-npm run dev
+### Prerequisites
+- Node.js 18+
+- MongoDB (local or Atlas) - **See setup guides below**
+
+### Quick Setup
+
+**👉 For fastest setup, see [QUICKSTART.md](./QUICKSTART.md)**
+
+**Or follow these steps:**
+
+1. **Set up MongoDB:**
+   - **Easiest:** Use MongoDB Atlas (cloud) - See [MONGODB_SETUP.md](./MONGODB_SETUP.md)
+   - **Alternative:** Install locally - See [MONGODB_SETUP.md](./MONGODB_SETUP.md)
+
+2. **Backend setup:**
+   ```bash
+   cd server
+   npm install
+   # Create .env file with MongoDB connection string
+   npm run dev
+   ```
+
+3. **Frontend setup:**
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+See [SETUP.md](./SETUP.md) for detailed instructions.
+
+## 📖 Usage
+
+1. **Sign Up**: Create an account with your email and password
+2. **Set Preferences**: Choose your housing preferences (optional, can skip)
+3. **Browse**: Swipe through available sublet listings
+4. **Like**: Tap the heart button on listings you're interested in
+5. **Match**: When a listing owner likes you back, you'll get a match!
+6. **Saved**: View all your liked listings in the Saved tab
+
+## 🏗️ Project Structure
+
+```
+HuskySublet/
+├── server/          # Backend (Express + MongoDB)
+├── src/
+│   ├── pages/      # Login, Signup, Setup pages
+│   ├── components/ # Reusable components
+│   ├── contexts/   # Auth context
+│   ├── utils/      # API client
+│   └── BrowseApp.tsx  # Main browsing interface
+└── package.json
 ```
 
-Opens at http://localhost:5173
+## 🔐 Authentication
 
-## Build for Production
+The app uses JWT (JSON Web Tokens) for authentication. Tokens are stored in localStorage and sent with each API request.
 
-```bash
-npm run build
-npm run preview
-```
+## 📡 API
 
-## Data Model
+The backend provides REST APIs for:
+- User authentication
+- Listing management
+- Matching system
+- Messaging (ready for chat UI)
 
-Each sublet includes:
-- Title, price, neighborhood
-- Start/end dates
-- Vibe tags (Quiet, Social, Pet-friendly, etc.)
-- Prompt question & answer (Hinge-style)
-- Contact email
+See [SETUP.md](./SETUP.md) for full API documentation.
 
-## Usage
+## 🎨 Design
 
-1. **Browse**: View sublets one at a time in card format
-2. **Filter**: Use sidebar to filter by price, location, and vibes
-3. **Pass**: Skip to next sublet
-4. **Interested**: Save to your list and reveal contact email
-5. **Saved**: View all your saved sublets with full contact info
+Inspired by Hinge's clean, minimalist aesthetic:
+- Black & white color scheme
+- Soft lilac/mauve accents
+- Smooth animations and transitions
+- Full-screen card experience
+- Fixed bottom action bar
+
+## 📝 Notes
+
+- Requires MongoDB connection (local or Atlas)
+- Images currently use placeholder URLs
+- All API endpoints (except auth) require authentication
+- JWT tokens expire after 7 days
+
+## 🤝 Contributing
+
+This is a learning project. Feel free to fork and extend!
+
+## 📄 License
+
+MIT

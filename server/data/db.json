@@ -1,0 +1,64 @@
+{
+  "users": [
+    {
+      "id": "1764126526491",
+      "email": "test@test.com",
+      "password": "$2a$10$X1CIuxKeVowrB7zwHlZ.8uwdrAq4Hc/n1GmQkTOL706ggaPIwIbDS",
+      "name": "Test User",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:08:46.491Z"
+    },
+    {
+      "id": "1764126593176",
+      "email": "newtest1764126593@test.com",
+      "password": "$2a$10$DS2NmtavmFJM3aUKXC5M9eW3vYPaoIAAm9AZL8oVMLioPbHvGjjo.",
+      "name": "New Test",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:09:53.176Z"
+    },
+    {
+      "id": "1764126621777",
+      "email": "hello@uw.edu",
+      "password": "$2a$10$8n/JaibomnsI41RxokF2b.LPdj0K7BtXfSPpzfyVwNLRTL1XxhENe",
+      "name": "teset",
+      "preferences": {
+        "priceRange": {
+          "min": 500,
+          "max": 2000
+        },
+        "numRoommates": "2",
+        "preferredGenders": [
+          "Male"
+        ],
+        "preferredLocations": [
+          "U-District"
+        ]
+      },
+      "createdAt": "2025-11-26T03:10:21.777Z"
+    }
+  ],
+  "listings": [],
+  "likes": [],
+  "matches": [],
+  "messages": []
+}
