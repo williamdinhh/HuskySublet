@@ -4,7 +4,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Setup from './pages/Setup';
-import BrowseApp from './BrowseApp'; // We'll rename the current App.tsx content
+import BrowseApp from './BrowseApp';
+import Profile from './pages/Profile';
+import Chat from './pages/Chat';
 
 export default function AppRouter() {
   const { user, loading } = useAuth();
@@ -41,6 +43,22 @@ export default function AppRouter() {
           ) : (
             <Navigate to="/login" replace />
           )
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute>
+            <Chat />
+          </ProtectedRoute>
         }
       />
       <Route

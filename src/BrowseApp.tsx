@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { api, Listing } from "./utils/api";
 import "./BrowseApp.css";
@@ -188,6 +188,7 @@ export default function BrowseApp() {
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Listings from API
   const [listings, setListings] = useState<Listing[]>([]);
@@ -203,8 +204,8 @@ export default function BrowseApp() {
   // Show email on current card after clicking "Interested"
   const [showEmail, setShowEmail] = useState<boolean>(false);
 
-  // View mode: 'browse' or 'saved'
-  const [viewMode, setViewMode] = useState<"browse" | "saved">("browse");
+  // Browse type: 'sellers' or 'buyers'
+  const [browseType, setBrowseType] = useState<"sellers" | "buyers">("sellers");
 
   // Filter drawer state
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -232,7 +233,7 @@ export default function BrowseApp() {
     const loadListings = async () => {
       try {
         setLoading(true);
-        const response = await api.getListings();
+        const response = await api.getListings(browseType);
         setListings(response.listings);
       } catch (err: any) {
         setError(err.message || "Failed to load listings");
@@ -241,25 +242,10 @@ export default function BrowseApp() {
       }
     };
 
-    if (viewMode === "browse") {
+    if (location.pathname === '/') {
       loadListings();
     }
-  }, [viewMode]);
-
-  // Load saved listings
-  useEffect(() => {
-    const loadSaved = async () => {
-      if (viewMode === "saved") {
-        try {
-          const response = await api.getSavedListings();
-          setListings(response.listings);
-        } catch (err: any) {
-          setError(err.message || "Failed to load saved listings");
-        }
-      }
-    };
-    loadSaved();
-  }, [viewMode]);
+  }, [browseType, location.pathname]);
 
   // ----------------------------------------------------------------------------
   // FILTERED SUBLETS - Compute based on filters
@@ -366,22 +352,7 @@ export default function BrowseApp() {
     }
   };
 
-  const handleRemoveFromSaved = async (id: string) => {
-    try {
-      await api.unlikeListing(id);
-      setLikedSublets(likedSublets.filter((subletId) => subletId !== id));
-      // Reload saved listings
-      const response = await api.getSavedListings();
-      setListings(response.listings);
-    } catch (err: any) {
-      alert(err.message || "Failed to remove from saved");
-    }
-  };
 
-  // Get full sublet objects for saved view
-  const savedSubletsList = listings.filter((sublet) =>
-    likedSublets.includes(sublet._id)
-  );
 
   // Reset to first card when filters change
   const resetToStart = () => {
@@ -401,7 +372,7 @@ export default function BrowseApp() {
   // Keyboard shortcuts: Left = Pass, Right = Interested, Left/Right arrows for image navigation when holding Shift
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (viewMode !== "browse" || !currentSublet) return;
+      if (location.pathname !== "/" || !currentSublet) return;
 
       // Image navigation with Shift + Arrow keys
       if (
@@ -442,7 +413,7 @@ export default function BrowseApp() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
-    viewMode,
+    location.pathname,
     currentIndex,
     filteredSublets.length,
     likedSublets,
@@ -599,26 +570,17 @@ export default function BrowseApp() {
     });
   };
 
+  // Only show browse content on home page
+  if (location.pathname !== '/') {
+    return null; // Let router handle other pages
+  }
+
   return (
     <div className="app">
       {/* TOP BAR */}
       <header className="top-bar">
         <h1 className="app-title">HuskySublet</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div className="view-toggle">
-            <button
-              className={viewMode === "browse" ? "active" : ""}
-              onClick={() => setViewMode("browse")}
-            >
-              Browse
-            </button>
-            <button
-              className={viewMode === "saved" ? "active" : ""}
-              onClick={() => setViewMode("saved")}
-            >
-              Saved ({likedSublets.length})
-            </button>
-          </div>
           <button
             onClick={logout}
             style={{
@@ -635,6 +597,80 @@ export default function BrowseApp() {
           </button>
         </div>
       </header>
+
+      {/* BOTTOM NAVIGATION */}
+      <nav style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'white',
+        borderTop: '1px solid #e0e0e0',
+        display: 'flex',
+        justifyContent: 'space-around',
+        padding: '0.75rem 0',
+        zIndex: 1000,
+      }}>
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.25rem',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: location.pathname === '/' ? '#007AFF' : '#666',
+            padding: '0.5rem 1rem',
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span style={{ fontSize: '0.75rem' }}>Home</span>
+        </button>
+        <button
+          onClick={() => navigate('/chat')}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.25rem',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: location.pathname === '/chat' ? '#007AFF' : '#666',
+            padding: '0.5rem 1rem',
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span style={{ fontSize: '0.75rem' }}>Chat</span>
+        </button>
+        <button
+          onClick={() => navigate('/profile')}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.25rem',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: location.pathname === '/profile' ? '#007AFF' : '#666',
+            padding: '0.5rem 1rem',
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span style={{ fontSize: '0.75rem' }}>Profile</span>
+        </button>
+      </nav>
 
       {/* FILTERS DRAWER */}
       <div
@@ -715,27 +751,83 @@ export default function BrowseApp() {
         </div>
       </aside>
 
-      <div className="main-content">
-        {viewMode === "browse" ? (
-          <>
-            {/* FILTER BUTTON */}
+      <div className="main-content" style={{ paddingBottom: '80px' }}>
+        <>
+          {/* SELLER/BUYER TAB */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            marginBottom: '1.5rem',
+            padding: '0 1rem',
+            background: '#f5f5f7',
+            borderRadius: '12px',
+            padding: '0.5rem',
+            maxWidth: '400px',
+            margin: '0 auto 1.5rem',
+          }}>
             <button
-              className="filter-button"
-              onClick={() => setFiltersOpen(true)}
-              aria-label="Open filters"
+              onClick={() => {
+                setBrowseType('sellers');
+                resetToStart();
+              }}
+              style={{
+                flex: 1,
+                padding: '0.875rem 1.5rem',
+                borderRadius: '10px',
+                border: 'none',
+                background: browseType === 'sellers' ? '#007AFF' : 'transparent',
+                color: browseType === 'sellers' ? 'white' : '#666',
+                cursor: 'pointer',
+                fontWeight: browseType === 'sellers' ? '600' : '500',
+                fontSize: '0.95rem',
+                transition: 'all 0.2s ease',
+                boxShadow: browseType === 'sellers' ? '0 2px 8px rgba(0,122,255,0.3)' : 'none',
+              }}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <line x1="4" y1="21" x2="4" y2="14"></line>
-                <line x1="4" y1="10" x2="4" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12" y2="3"></line>
-                <line x1="20" y1="21" x2="20" y2="16"></line>
-                <line x1="20" y1="12" x2="20" y2="3"></line>
-                <line x1="1" y1="14" x2="7" y2="14"></line>
-                <line x1="9" y1="8" x2="15" y2="8"></line>
-                <line x1="17" y1="16" x2="23" y2="16"></line>
-              </svg>
+              Browse Sellers
             </button>
+            <button
+              onClick={() => {
+                setBrowseType('buyers');
+                resetToStart();
+              }}
+              style={{
+                flex: 1,
+                padding: '0.875rem 1.5rem',
+                borderRadius: '10px',
+                border: 'none',
+                background: browseType === 'buyers' ? '#007AFF' : 'transparent',
+                color: browseType === 'buyers' ? 'white' : '#666',
+                cursor: 'pointer',
+                fontWeight: browseType === 'buyers' ? '600' : '500',
+                fontSize: '0.95rem',
+                transition: 'all 0.2s ease',
+                boxShadow: browseType === 'buyers' ? '0 2px 8px rgba(0,122,255,0.3)' : 'none',
+              }}
+            >
+              Browse Buyers
+            </button>
+          </div>
+
+          {/* FILTER BUTTON */}
+          <button
+            className="filter-button"
+            onClick={() => setFiltersOpen(true)}
+            aria-label="Open filters"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <line x1="4" y1="21" x2="4" y2="14"></line>
+              <line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line>
+              <line x1="20" y1="12" x2="20" y2="3"></line>
+              <line x1="1" y1="14" x2="7" y2="14"></line>
+              <line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+          </button>
 
             {/* MAIN CARD AREA */}
             <main className="card-area">
@@ -986,81 +1078,35 @@ export default function BrowseApp() {
               )}
             </main>
 
-            {/* BOTTOM ACTION BAR */}
-            {viewMode === "browse" && currentSublet && (
-              <div className="bottom-action-bar">
-                <button
-                  className="action-button pass-button"
-                  onClick={handlePass}
-                  aria-label="Pass"
+          {/* BOTTOM ACTION BAR */}
+          {currentSublet && (
+            <div className="bottom-action-bar">
+              <button
+                className="action-button pass-button"
+                onClick={handlePass}
+                aria-label="Pass"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+              <button
+                className="action-button like-button"
+                onClick={handleInterested}
+                aria-label="Interested"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="currentColor"
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-                <button
-                  className="action-button like-button"
-                  onClick={handleInterested}
-                  aria-label="Interested"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    stroke="currentColor"
-                  >
-                    <path d="M12 21s-8-4.5-8-11.8A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 8 3.2C20 16.5 12 21 12 21z"></path>
-                  </svg>
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          /* SAVED VIEW */
-          <div className="saved-view">
-            <h2>Your Saved Sublets</h2>
-            {savedSubletsList.length === 0 ? (
-              <p className="no-saved">
-                You haven't saved any sublets yet. Start browsing!
-              </p>
-            ) : (
-              <div className="saved-list">
-                {savedSubletsList.map((sublet) => (
-                  <div key={sublet._id} className="saved-card">
-                    <div className="saved-header">
-                      <h3>{sublet.title}</h3>
-                      <button
-                        className="remove-btn"
-                        onClick={() => handleRemoveFromSaved(sublet._id)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <div className="saved-info">
-                      <p>
-                        <strong>Price:</strong> ${sublet.price}/month
-                      </p>
-                      <p>
-                        <strong>Location:</strong> {sublet.neighborhood}
-                      </p>
-                      <p>
-                        <strong>Available:</strong>{" "}
-                        {formatDate(sublet.startDate)} -{" "}
-                        {formatDate(sublet.endDate)}
-                      </p>
-                      <p>
-                        <strong>Contact:</strong>{" "}
-                        {typeof sublet.ownerId === "object"
-                          ? sublet.ownerId.email
-                          : "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                  <path d="M12 21s-8-4.5-8-11.8A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 8 3.2C20 16.5 12 21 12 21z"></path>
+                </svg>
+              </button>
+            </div>
+          )}
+        </>
       </div>
     </div>
   );

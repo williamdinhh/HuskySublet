@@ -13,6 +13,7 @@ import {
   createMatch,
   findUserById,
   getDb,
+  saveDb,
 } from '../db.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -23,6 +24,7 @@ const populateListing = async (listing) => {
   const owner = await findUserById(listing.ownerId);
   return {
     ...listing,
+    _id: listing.id, // Add _id for frontend compatibility
     ownerId: owner ? {
       id: owner.id,
       name: owner.name,
@@ -35,6 +37,10 @@ const populateListing = async (listing) => {
 router.get('/browse', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
+    const browseType = req.query.type; // 'sellers' or 'buyers'
+    
+    // Get current user to check their role
+    const currentUser = await findUserById(userId);
     
     // Get all listings user has already liked
     const userLikes = await findLikes({ userId });
@@ -46,6 +52,31 @@ router.get('/browse', authenticate, async (req, res) => {
       excludeOwnerId: userId,
       excludeIds: likedListingIds,
     });
+
+    // Filter by seller/buyer role if specified
+    if (browseType === 'sellers') {
+      // Show listings from sellers (users with role 'seller' or 'both')
+      const sellerIds = new Set();
+      const data = await getDb();
+      data.users.forEach(u => {
+        if ((u.role === 'seller' || u.role === 'both') && u.id !== userId) {
+          sellerIds.add(u.id);
+        }
+      });
+      listings = listings.filter(l => sellerIds.has(l.ownerId));
+    } else if (browseType === 'buyers') {
+      // For buyers tab, show listings from users who are buyers or both
+      // But only if they have listings (since buyers typically don't list, but "both" users might)
+      const buyerIds = new Set();
+      const data = await getDb();
+      data.users.forEach(u => {
+        // Only show buyers (not sellers) - so exclude sellers, only show pure buyers
+        if (u.role === 'buyer' && u.id !== userId) {
+          buyerIds.add(u.id);
+        }
+      });
+      listings = listings.filter(l => buyerIds.has(l.ownerId));
+    }
 
     // Populate owner info
     listings = await Promise.all(listings.map(populateListing));
@@ -136,9 +167,15 @@ router.delete('/:id', authenticate, async (req, res) => {
       return res.status(403).json({ error: 'Not authorized to delete this listing' });
     }
 
-    await updateListing(req.params.id, { isActive: false });
+    // Actually delete from database
+    const data = await getDb();
+    const index = data.listings.findIndex(l => l.id === req.params.id);
+    if (index !== -1) {
+      data.listings.splice(index, 1);
+      await saveDb();
+    }
 
-    res.json({ message: 'Listing deactivated successfully' });
+    res.json({ message: 'Listing deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

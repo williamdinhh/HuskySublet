@@ -55,6 +55,7 @@ export const createUser = async (userData) => {
   const data = await getDb();
   const user = {
     id: Date.now().toString(),
+    role: userData.role || 'buyer', // Default to buyer
     ...userData,
     email: userData.email.toLowerCase(),
     createdAt: new Date().toISOString(),
@@ -67,6 +68,15 @@ export const createUser = async (userData) => {
   await saveDb();
   const { password, ...userWithoutPassword } = user;
   return userWithoutPassword;
+};
+
+export const updateUser = async (id, updates) => {
+  const data = await getDb();
+  const index = data.users.findIndex(u => u.id === id);
+  if (index === -1) return null;
+  data.users[index] = { ...data.users[index], ...updates };
+  await saveDb();
+  return data.users[index];
 };
 
 export const comparePassword = async (plainPassword, hashedPassword) => {

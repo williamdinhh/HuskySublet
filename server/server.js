@@ -48,8 +48,22 @@ app.get('/api/health', (req, res) => {
 // Initialize database (creates file if it doesn't exist)
 const initDB = async () => {
   try {
-    await getDb();
+    const data = await getDb();
     console.log('✅ Database initialized (file-based JSON)');
+    
+    // Seed initial data if no listings exist
+    if (data.listings.length === 0 && data.users.length < 10) {
+      console.log('🌱 Seeding initial data...');
+      try {
+        const seedModule = await import('./seed-data.js');
+        if (seedModule.seedDatabase) {
+          await seedModule.seedDatabase();
+        }
+      } catch (err) {
+        console.log('⚠️  Could not auto-seed database. Run "npm run seed" manually if needed.');
+        console.error(err);
+      }
+    }
   } catch (error) {
     console.error('❌ Database initialization error:', error);
     process.exit(1);

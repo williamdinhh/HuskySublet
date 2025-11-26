@@ -1,10 +1,11 @@
 {
   "users": [
     {
-      "id": "1764126526491",
-      "email": "test@test.com",
-      "password": "$2a$10$X1CIuxKeVowrB7zwHlZ.8uwdrAq4Hc/n1GmQkTOL706ggaPIwIbDS",
-      "name": "Test User",
+      "id": "1764127983005",
+      "role": "seller",
+      "email": "alex.chen@uw.edu",
+      "password": "$2a$10$uVeth./p5Jg84bMPXG.kUuZzKlg2ys193F2RlRrWUacWNzGDiuz8u",
+      "name": "Alex Chen",
       "preferences": {
         "priceRange": {
           "min": 0,
@@ -16,13 +17,14 @@
         ],
         "preferredLocations": []
       },
-      "createdAt": "2025-11-26T03:08:46.491Z"
+      "createdAt": "2025-11-26T03:33:03.005Z"
     },
     {
-      "id": "1764126593176",
-      "email": "newtest1764126593@test.com",
-      "password": "$2a$10$DS2NmtavmFJM3aUKXC5M9eW3vYPaoIAAm9AZL8oVMLioPbHvGjjo.",
-      "name": "New Test",
+      "id": "1764127983075",
+      "role": "seller",
+      "email": "sarah.m@uw.edu",
+      "password": "$2a$10$d7UjzSI1Dco57YBKvE7tuOkFhEj8qjEJITho0/Cq2wXWfG7BJik7u",
+      "name": "Sarah Martinez",
       "preferences": {
         "priceRange": {
           "min": 0,
@@ -34,30 +36,529 @@
         ],
         "preferredLocations": []
       },
-      "createdAt": "2025-11-26T03:09:53.176Z"
+      "createdAt": "2025-11-26T03:33:03.075Z"
     },
     {
-      "id": "1764126621777",
-      "email": "hello@uw.edu",
-      "password": "$2a$10$8n/JaibomnsI41RxokF2b.LPdj0K7BtXfSPpzfyVwNLRTL1XxhENe",
-      "name": "teset",
+      "id": "1764127983133",
+      "role": "both",
+      "email": "mike.johnson@uw.edu",
+      "password": "$2a$10$MyDrbcpQdFFVSL1s20/ut.G28ixK6VnW/FD08IAKqnTQZimF612ge",
+      "name": "Mike Johnson",
       "preferences": {
         "priceRange": {
-          "min": 500,
+          "min": 0,
           "max": 2000
         },
-        "numRoommates": "2",
+        "numRoommates": "Any",
         "preferredGenders": [
-          "Male"
+          "Any"
         ],
-        "preferredLocations": [
-          "U-District"
-        ]
+        "preferredLocations": []
       },
-      "createdAt": "2025-11-26T03:10:21.777Z"
+      "createdAt": "2025-11-26T03:33:03.133Z"
+    },
+    {
+      "id": "1764127983190",
+      "role": "seller",
+      "email": "emily.wang@uw.edu",
+      "password": "$2a$10$jHgzCv4IWqbNqMpPvnbtg.45WM3q5dKLzMTo1uM6D.w45V6HFpt2u",
+      "name": "Emily Wang",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.190Z"
+    },
+    {
+      "id": "1764127983248",
+      "role": "seller",
+      "email": "david.kim@uw.edu",
+      "password": "$2a$10$GhBaxFh7KA4Oo5FBjKmQ0.iqYWi87PQsz3BlbP2SNhhL37uZUlCfa",
+      "name": "David Kim",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.248Z"
+    },
+    {
+      "id": "1764127983305",
+      "role": "both",
+      "email": "lisa.patel@uw.edu",
+      "password": "$2a$10$mRAdEALZNM.Rhl3YU0M4Wu/NzAwA6.oZPbbSz3G0hVQBnXZW.h0he",
+      "name": "Lisa Patel",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.305Z"
+    },
+    {
+      "id": "1764127983362",
+      "role": "buyer",
+      "email": "james.lee@uw.edu",
+      "password": "$2a$10$U2Q5cHs9Pmv9LQWBDB/lR.2KRx36FtJR4Iyr8zqhYdanPST/b0sBK",
+      "name": "James Lee",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.362Z"
+    },
+    {
+      "id": "1764127983419",
+      "role": "seller",
+      "email": "maya.rodriguez@uw.edu",
+      "password": "$2a$10$Cl0pIJHDyOmL.o/dRwG0..t59DI7zp668Mr2VcKuSj4z6j5dDA6uO",
+      "name": "Maya Rodriguez",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.419Z"
+    },
+    {
+      "id": "1764127983475",
+      "role": "buyer",
+      "email": "ryan.park@uw.edu",
+      "password": "$2a$10$Rkz0NwVoe2olJCTY9256dOt3DYLxkJDh4Xh/nGyNiS51UedDBRK/q",
+      "name": "Ryan Park",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.475Z"
+    },
+    {
+      "id": "1764127983532",
+      "role": "buyer",
+      "email": "sophia.nguyen@uw.edu",
+      "password": "$2a$10$m/sbeWAjf9IcBOeU7jDWo.HTJLWaMYsjOGEJ35aBshu.VeJYxbewO",
+      "name": "Sophia Nguyen",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.532Z"
+    },
+    {
+      "id": "1764127983589",
+      "role": "buyer",
+      "email": "chris.taylor@uw.edu",
+      "password": "$2a$10$pQpr61fipDW5jHQ6a5hV.OmuSu9rxJNRByC/yBOhsHGHckyP6UVxS",
+      "name": "Chris Taylor",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.589Z"
+    },
+    {
+      "id": "1764127983646",
+      "role": "buyer",
+      "email": "jessica.wong@uw.edu",
+      "password": "$2a$10$k9xjRCaPuKO7uhWoaSb0q.KEs6MrFXB6b5VyDtzKZIniUH1GqolpK",
+      "name": "Jessica Wong",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.646Z"
+    },
+    {
+      "id": "1764127983702",
+      "role": "buyer",
+      "email": "marcus.brown@uw.edu",
+      "password": "$2a$10$wHKE5AolSkQDalz85dr1Ou7e1I725itjoKB3X8zmhlt7JL2L.t9I6",
+      "name": "Marcus Brown",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.702Z"
+    },
+    {
+      "id": "1764127983758",
+      "role": "buyer",
+      "email": "olivia.davis@uw.edu",
+      "password": "$2a$10$UVDx0nLWN5m09dYjiYxRxu0jlgdueh5yxBSckgP.PkYQMYn/nspxe",
+      "name": "Olivia Davis",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.758Z"
+    },
+    {
+      "id": "1764127983814",
+      "role": "seller",
+      "email": "jake.wilson@uw.edu",
+      "password": "$2a$10$BBckjatAtv/fwuY/9WHdmui8PzCVA73PbosRTcLTj1xXJfa48knIm",
+      "name": "Jake Wilson",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.814Z"
+    },
+    {
+      "id": "1764127983870",
+      "role": "seller",
+      "email": "isabella.garcia@uw.edu",
+      "password": "$2a$10$lf4c0Hh4wrweOJIoYj2q4ObZgLT3vLx4idH/iFI01MxdehXSsW5JW",
+      "name": "Isabella Garcia",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:33:03.870Z"
+    },
+    {
+      "id": "1764128076731",
+      "role": "seller",
+      "email": "sdhgjsdg@uw.edu",
+      "password": "$2a$10$xCV3JdjmaeKkhBLk5odvCe5vV54yo.v5SvXXlGJmhSDPZAByYaX6u",
+      "name": "andy huynh",
+      "preferences": {
+        "priceRange": {
+          "min": 0,
+          "max": 2000
+        },
+        "numRoommates": "Any",
+        "preferredGenders": [
+          "Any"
+        ],
+        "preferredLocations": []
+      },
+      "createdAt": "2025-11-26T03:34:36.732Z"
     }
   ],
-  "listings": [],
+  "listings": [
+    {
+      "id": "1764127983927",
+      "ownerId": "1764127983005",
+      "title": "3-bed near U-District – Summer sublet",
+      "price": 950,
+      "neighborhood": "U-District",
+      "startDate": "2024-06-15T00:00:00.000Z",
+      "endDate": "2024-08-31T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=1",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=1a",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=1b"
+      ],
+      "vibes": [
+        "Quiet",
+        "Clean",
+        "Pet-friendly"
+      ],
+      "promptQuestion": "What makes this place special?",
+      "promptAnswer": "Right next to campus with a rooftop view of Mount Rainier. Plus, my cat Oliver will be here to greet you!",
+      "createdAt": "2025-11-26T03:33:03.927Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983927",
+      "ownerId": "1764127983075",
+      "title": "Cozy studio in Capitol Hill",
+      "price": 1200,
+      "neighborhood": "Capitol Hill",
+      "startDate": "2024-07-01T00:00:00.000Z",
+      "endDate": "2024-09-15T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=2",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=2a"
+      ],
+      "vibes": [
+        "Social",
+        "Modern",
+        "Near nightlife"
+      ],
+      "promptQuestion": "Perfect roommate is...",
+      "promptAnswer": "Someone who loves exploring local coffee shops and doesn't mind the occasional house party! Weekend brunch enthusiast a plus.",
+      "createdAt": "2025-11-26T03:33:03.927Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983927",
+      "ownerId": "1764127983133",
+      "title": "Shared house with backyard - Northgate",
+      "price": 750,
+      "neighborhood": "Northgate",
+      "startDate": "2024-06-01T00:00:00.000Z",
+      "endDate": "2024-08-20T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=3",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=3a",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=3b",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=3c"
+      ],
+      "vibes": [
+        "Chill",
+        "Spacious",
+        "Backyard"
+      ],
+      "promptQuestion": "What's your ideal weekend?",
+      "promptAnswer": "BBQs in the backyard, board game nights, and walks to the light rail. We're pretty low-key but always down to hang.",
+      "createdAt": "2025-11-26T03:33:03.927Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983928",
+      "ownerId": "1764127983190",
+      "title": "Private room - walking distance to UW",
+      "price": 850,
+      "neighborhood": "U-District",
+      "startDate": "2024-05-25T00:00:00.000Z",
+      "endDate": "2024-09-01T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=4",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=4a"
+      ],
+      "vibes": [
+        "Quiet",
+        "Study-friendly",
+        "Furnished"
+      ],
+      "promptQuestion": "What are you looking for in a subletter?",
+      "promptAnswer": "A quiet, responsible student. I have finals so need someone respectful of study time. Fully furnished with a desk!",
+      "createdAt": "2025-11-26T03:33:03.928Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983928",
+      "ownerId": "1764127983248",
+      "title": "Loft apartment with skyline views",
+      "price": 1400,
+      "neighborhood": "Capitol Hill",
+      "startDate": "2024-06-10T00:00:00.000Z",
+      "endDate": "2024-08-25T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=5",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=5a",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=5b",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=5c",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=5d"
+      ],
+      "vibes": [
+        "Modern",
+        "Bright",
+        "Gym access"
+      ],
+      "promptQuestion": "Three things to know about this place",
+      "promptAnswer": "1) Floor-to-ceiling windows 2) Building has a gym and rooftop deck 3) Walking distance to Pike Place Market",
+      "createdAt": "2025-11-26T03:33:03.928Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983928",
+      "ownerId": "1764127983305",
+      "title": "Room in grad student house",
+      "price": 800,
+      "neighborhood": "U-District",
+      "startDate": "2024-06-20T00:00:00.000Z",
+      "endDate": "2024-09-10T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=6",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=6a",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=6b"
+      ],
+      "vibes": [
+        "Academic",
+        "Collaborative",
+        "Plant-filled"
+      ],
+      "promptQuestion": "What's the vibe of the house?",
+      "promptAnswer": "PhD students in STEM fields. Lots of late-night study sessions, espresso machine always running, and indoor plants everywhere.",
+      "createdAt": "2025-11-26T03:33:03.928Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983929",
+      "ownerId": "1764127983419",
+      "title": "Artist's loft near Pike Place",
+      "price": 1100,
+      "neighborhood": "Other",
+      "startDate": "2024-06-15T00:00:00.000Z",
+      "endDate": "2024-09-05T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=8",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=8a",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=8b",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=8c"
+      ],
+      "vibes": [
+        "Creative",
+        "Unique",
+        "Natural light"
+      ],
+      "promptQuestion": "What's your space like?",
+      "promptAnswer": "Exposed brick, huge windows, and an artsy neighborhood. I'm a painter so there's lots of natural light and creative energy.",
+      "createdAt": "2025-11-26T03:33:03.929Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983929",
+      "ownerId": "1764127983870",
+      "title": "Modern 2-bedroom with balcony",
+      "price": 1300,
+      "neighborhood": "Capitol Hill",
+      "startDate": "2024-07-01T00:00:00.000Z",
+      "endDate": "2024-09-30T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=9",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=9a",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=9b"
+      ],
+      "vibes": [
+        "Modern",
+        "Bright",
+        "Balcony"
+      ],
+      "promptQuestion": "Best feature of this place?",
+      "promptAnswer": "Amazing city views from the private balcony and a fully updated kitchen with stainless steel appliances.",
+      "createdAt": "2025-11-26T03:33:03.929Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983930",
+      "ownerId": "1764127983005",
+      "title": "Private basement suite",
+      "price": 900,
+      "neighborhood": "Northgate",
+      "startDate": "2024-07-15T00:00:00.000Z",
+      "endDate": "2024-09-15T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=11",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=11a",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=11b"
+      ],
+      "vibes": [
+        "Private",
+        "Quiet",
+        "Parking included"
+      ],
+      "promptQuestion": "Why choose this place?",
+      "promptAnswer": "Complete privacy with your own entrance, bathroom, and kitchenette. Plus free parking spot included!",
+      "createdAt": "2025-11-26T03:33:03.930Z",
+      "isActive": true
+    },
+    {
+      "id": "1764127983930",
+      "ownerId": "1764127983248",
+      "title": "Luxury apartment with amenities",
+      "price": 1600,
+      "neighborhood": "Capitol Hill",
+      "startDate": "2024-06-20T00:00:00.000Z",
+      "endDate": "2024-10-01T00:00:00.000Z",
+      "images": [
+        "https://source.unsplash.com/600x400/?apartment,room&sig=12",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=12a",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=12b",
+        "https://source.unsplash.com/600x400/?apartment,room&sig=12c"
+      ],
+      "vibes": [
+        "Modern",
+        "Gym access",
+        "Rooftop"
+      ],
+      "promptQuestion": "What amenities are included?",
+      "promptAnswer": "Building has a 24/7 gym, rooftop deck with BBQ, and secure parking. Walking distance to everything!",
+      "createdAt": "2025-11-26T03:33:03.930Z",
+      "isActive": true
+    }
+  ],
   "likes": [],
   "matches": [],
   "messages": []

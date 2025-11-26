@@ -6,6 +6,7 @@ import {
   comparePassword,
   getDb,
   saveDb,
+  updateUser,
 } from '../db.js';
 
 const router = express.Router();
@@ -31,12 +32,18 @@ router.post('/signup', async (req, res) => {
     }
 
     // Create user
-    const user = await createUser({ email, password, name, preferences: {
-      priceRange: { min: 0, max: 2000 },
-      numRoommates: 'Any',
-      preferredGenders: ['Any'],
-      preferredLocations: [],
-    }});
+    const user = await createUser({ 
+      email, 
+      password, 
+      name, 
+      role: 'buyer', // Default role
+      preferences: {
+        priceRange: { min: 0, max: 2000 },
+        numRoommates: 'Any',
+        preferredGenders: ['Any'],
+        preferredLocations: [],
+      }
+    });
 
     // Generate token
     const token = generateToken(user.id);
@@ -89,6 +96,7 @@ router.post('/login', async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role,
         preferences: user.preferences,
       },
     });
@@ -120,6 +128,37 @@ router.get('/me', async (req, res) => {
     });
   } catch (error) {
     res.status(401).json({ error: 'Invalid or expired token' });
+  }
+});
+
+// Update user role
+router.put('/role', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
+    const { role } = req.body;
+    
+    if (!role || !['buyer', 'seller', 'both'].includes(role)) {
+      return res.status(400).json({ error: 'Valid role (buyer, seller, or both) is required' });
+    }
+
+    const updated = await updateUser(decoded.userId, { role });
+    if (!updated) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const { password, ...userWithoutPassword } = updated;
+
+    res.json({
+      user: userWithoutPassword,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

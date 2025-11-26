@@ -96,9 +96,17 @@ class ApiClient {
     });
   }
 
+  async updateRole(role: 'buyer' | 'seller' | 'both') {
+    return this.request<{ user: User }>('/auth/role', {
+      method: 'PUT',
+      body: JSON.stringify({ role }),
+    });
+  }
+
   // Listing endpoints
-  async getListings() {
-    return this.request<{ listings: Listing[] }>('/listings/browse');
+  async getListings(type?: 'sellers' | 'buyers') {
+    const endpoint = type ? `/listings/browse?type=${type}` : '/listings/browse';
+    return this.request<{ listings: Listing[] }>(endpoint);
   }
 
   async getMyListings() {
@@ -114,6 +122,13 @@ class ApiClient {
 
   async getListing(id: string) {
     return this.request<{ listing: Listing }>(`/listings/${id}`);
+  }
+
+  async updateListing(id: string, listing: Partial<Omit<Listing, '_id' | 'ownerId' | 'createdAt'>>) {
+    return this.request<{ listing: Listing }>(`/listings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(listing),
+    });
   }
 
   async likeListing(id: string) {
@@ -133,6 +148,12 @@ class ApiClient {
 
   async getSavedListings() {
     return this.request<{ listings: Listing[] }>('/listings/likes/saved');
+  }
+
+  async deleteListing(id: string) {
+    return this.request<{ message: string }>(`/listings/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   // Match endpoints
@@ -165,6 +186,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  role?: 'buyer' | 'seller' | 'both';
   preferences?: UserPreferences;
 }
 
