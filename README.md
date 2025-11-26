@@ -21,11 +21,13 @@ Opens at http://localhost:3000
 ## 2-Hour Build Plan
 
 **Hour 1:**
+
 - Set up project ✓
 - Build form with validation
 - Store in mock data
 
 **Hour 2:**
+
 - Build listing view
 - Add filters
 - Style with Husky colors
