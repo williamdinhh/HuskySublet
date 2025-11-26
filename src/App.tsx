@@ -470,88 +470,164 @@ function App() {
             {/* MAIN CARD AREA */}
             <main className="card-area">
               {currentSublet ? (
-                <div
-                  className={`profile-card ${swipeClass} ${
-                    isDragging ? "dragging" : ""
-                  }`}
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
-                  onMouseDown={onMouseDown}
-                  style={{
-                    transform: isDragging
-                      ? `translateX(${dragX}px) rotate(${dragX / 25}deg)`
-                      : undefined,
-                    transition: isDragging ? "none" : "transform 0.2s ease",
-                  }}
-                >
-                  {/* Title */}
-                  <h2 className="card-title">{currentSublet.title}</h2>
-
-                  {/* Price, Neighborhood, Dates */}
-                  <div className="card-info">
-                    <div className="info-item">
-                      <span className="info-label">Price:</span>
-                      <span className="info-value">
-                        ${currentSublet.price}/month
-                      </span>
-                    </div>
-                    <div className="info-item">
-                      <span className="info-label">Location:</span>
-                      <span className="info-value">
-                        {currentSublet.neighborhood}
-                      </span>
-                    </div>
-                    <div className="info-item">
-                      <span className="info-label">Dates:</span>
-                      <span className="info-value">
-                        {currentSublet.startDate} to {currentSublet.endDate}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Vibe Tags */}
-                  <div className="vibe-tags">
-                    {currentSublet.vibes.map((vibe) => (
-                      <span key={vibe} className="vibe-badge">
-                        {vibe}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Prompt Question & Answer */}
-                  <div className="prompt-section">
-                    <div className="prompt-question">
-                      {currentSublet.promptQuestion}
-                    </div>
-                    <div className="prompt-answer">
-                      {currentSublet.promptAnswer}
-                    </div>
-                  </div>
-
-                  {/* Email (only shown after "Interested" is clicked) */}
-                  {showEmail && (
-                    <div className="email-reveal">
-                      ✉️ Contact: <strong>{currentSublet.email}</strong>
+                <div className="card-stack">
+                  {filteredSublets[currentIndex + 1] && (
+                    <div
+                      className="profile-card behind"
+                      aria-hidden
+                      style={{
+                        transform: `scale(${
+                          0.98 + Math.min(Math.abs(dragX) / 600, 0.04)
+                        }) translateY(8px) translateX(${-dragX * 0.04}px)`,
+                        opacity: 0.7,
+                      }}
+                    >
+                      <h2 className="card-title">
+                        {filteredSublets[currentIndex + 1].title}
+                      </h2>
+                      <div className="card-info">
+                        <div className="info-item">
+                          <span className="info-label">Price:</span>
+                          <span className="info-value">
+                            ${filteredSublets[currentIndex + 1].price}/month
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   )}
 
-                  {/* Action Buttons */}
-                  <div className="action-buttons">
-                    <button className="pass-btn" onClick={handlePass}>
-                      ✕ Pass
-                    </button>
-                    <button
-                      className="interested-btn"
-                      onClick={handleInterested}
+                  <div
+                    className={`profile-card ${swipeClass} ${
+                      isDragging ? "dragging" : ""
+                    }`}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                    onMouseDown={onMouseDown}
+                    style={{
+                      transform: isDragging
+                        ? `translateX(${dragX}px) rotate(${dragX / 25}deg)`
+                        : undefined,
+                      transition: isDragging ? "none" : "transform 0.2s ease",
+                    }}
+                  >
+                    <div
+                      className={`swipe-badge pass ${
+                        isDragging && dragX < -20 ? "show" : ""
+                      }`}
+                      style={{ opacity: Math.min(Math.abs(dragX) / 100, 1) }}
                     >
-                      ♥ Interested
-                    </button>
-                  </div>
+                      PASS
+                    </div>
+                    <div
+                      className={`swipe-badge like ${
+                        isDragging && dragX > 20 ? "show" : ""
+                      }`}
+                      style={{ opacity: Math.min(Math.abs(dragX) / 100, 1) }}
+                    >
+                      LIKE
+                    </div>
+                    {/* Title */}
+                    <h2 className="card-title">{currentSublet.title}</h2>
 
-                  {/* Card Counter */}
-                  <div className="card-counter">
-                    {currentIndex + 1} / {filteredSublets.length}
+                    {/* Price, Neighborhood, Dates */}
+                    <div className="card-info">
+                      <div className="info-item">
+                        <span className="info-label">Price:</span>
+                        <span className="info-value">
+                          ${currentSublet.price}/month
+                        </span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">Location:</span>
+                        <span className="info-value">
+                          {currentSublet.neighborhood}
+                        </span>
+                      </div>
+                      <div className="info-item">
+                        <span className="info-label">Dates:</span>
+                        <span className="info-value">
+                          {currentSublet.startDate} to {currentSublet.endDate}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Vibe Tags */}
+                    <div className="vibe-tags">
+                      {currentSublet.vibes.map((vibe) => (
+                        <span key={vibe} className="vibe-badge">
+                          {vibe}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Prompt Question & Answer */}
+                    <div className="prompt-section">
+                      <div className="prompt-question">
+                        {currentSublet.promptQuestion}
+                      </div>
+                      <div className="prompt-answer">
+                        {currentSublet.promptAnswer}
+                      </div>
+                    </div>
+
+                    {/* Email (only shown after "Interested" is clicked) */}
+                    {showEmail && (
+                      <div className="email-reveal">
+                        ✉️ Contact: <strong>{currentSublet.email}</strong>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="action-buttons">
+                      <button
+                        className="circle-btn pass-btn"
+                        onClick={handlePass}
+                        aria-label="Pass"
+                      >
+                        <svg
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M6 6l12 12M18 6L6 18"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        className="circle-btn interested-btn"
+                        onClick={handleInterested}
+                        aria-label="Interested"
+                      >
+                        <svg
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M12 21s-6.5-4.35-9-8.1C1.2 10.2 2.1 7.5 4.5 6.3 6.4 5.3 8.7 6 10 7.6c1.3-1.6 3.6-2.3 5.5-1.3 2.4 1.2 3.3 3.9 1.5 6.6-2.5 3.75-9 8.1-9 8.1z"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Card Counter */}
+                    <div className="card-counter">
+                      {currentIndex + 1} / {filteredSublets.length}
+                    </div>
                   </div>
                 </div>
               ) : (

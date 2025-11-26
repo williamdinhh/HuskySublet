@@ -197,6 +197,13 @@ body {
   padding: 1rem;
 }
 
+/* Card stack for Hinge-like deck */
+.card-stack {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
 .profile-card {
   background: white;
   border-radius: 16px;
@@ -207,6 +214,18 @@ body {
   position: relative;
   user-select: none;
   cursor: grab;
+}
+
+.profile-card.behind {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  transform: scale(0.98) translateY(8px);
+  opacity: 0.7;
+  pointer-events: none;
+  filter: saturate(0.95);
 }
 
 .profile-card.dragging {
@@ -234,6 +253,39 @@ body {
     transform: translateX(120%) rotate(8deg);
     opacity: 0;
   }
+}
+
+/* Swipe badges (LIKE/PASS overlays) */
+.swipe-badge {
+  position: absolute;
+  top: 16px;
+  padding: 8px 14px;
+  border: 3px solid currentColor;
+  border-radius: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.swipe-badge.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.swipe-badge.pass {
+  left: 16px;
+  color: #ff6b6b;
+  transform: rotate(-12deg);
+}
+
+.swipe-badge.like {
+  right: 16px;
+  color: #2ecc71;
+  transform: rotate(12deg);
 }
 
 .card-title {
@@ -333,13 +385,13 @@ body {
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 1.25rem;
   margin-top: 2rem;
+  justify-content: center;
 }
 
 .pass-btn,
 .interested-btn {
-  flex: 1;
   padding: 1rem;
   border: none;
   border-radius: 50px;
@@ -351,6 +403,17 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+}
+
+/* Circular variant for Hinge-like action bar */
+.circle-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 1.5rem;
+  flex: 0 0 auto;
+  box-shadow: var(--shadow);
 }
 
 .pass-btn {
