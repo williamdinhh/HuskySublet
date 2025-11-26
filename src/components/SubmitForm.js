@@ -90,9 +90,10 @@ function SubmitForm({ onSubmit }) {
 
   return (
     <div className="form-container">
+      <h2 className="form-section-title">List your sublet</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Signal Type *</label>
+          <label>What are you offering? *</label>
           <select name="type" value={formData.type} onChange={handleChange}>
             {SIGNAL_TYPES.map((type) => (
               <option key={type.value} value={type.value}>
@@ -104,23 +105,23 @@ function SubmitForm({ onSubmit }) {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Name/Alias *</label>
+            <label>YOUR NAME *</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Alex Chen"
+              placeholder="First name or alias"
             />
             {errors.name && (
-              <span style={{ color: "red", fontSize: "0.9rem" }}>
+              <span style={{ color: "#ff385c", fontSize: "0.875rem" }}>
                 {errors.name}
               </span>
             )}
           </div>
 
           <div className="form-group">
-            <label>UW Email *</label>
+            <label>UW EMAIL *</label>
             <input
               type="email"
               name="email"
@@ -129,7 +130,7 @@ function SubmitForm({ onSubmit }) {
               placeholder="yourname@uw.edu"
             />
             {errors.email && (
-              <span style={{ color: "red", fontSize: "0.9rem" }}>
+              <span style={{ color: "#ff385c", fontSize: "0.875rem" }}>
                 {errors.email}
               </span>
             )}
@@ -138,13 +139,13 @@ function SubmitForm({ onSubmit }) {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Neighborhood *</label>
+            <label>NEIGHBORHOOD *</label>
             <select
               name="neighborhood"
               value={formData.neighborhood}
               onChange={handleChange}
             >
-              <option value="">Select neighborhood...</option>
+              <option value="">Select neighborhood</option>
               {NEIGHBORHOODS.map((n) => (
                 <option key={n} value={n}>
                   {n}
@@ -152,20 +153,20 @@ function SubmitForm({ onSubmit }) {
               ))}
             </select>
             {errors.neighborhood && (
-              <span style={{ color: "red", fontSize: "0.9rem" }}>
+              <span style={{ color: "#ff385c", fontSize: "0.875rem" }}>
                 {errors.neighborhood}
               </span>
             )}
           </div>
 
           <div className="form-group">
-            <label>Price Range *</label>
+            <label>PRICE RANGE *</label>
             <select
               name="priceRange"
               value={formData.priceRange}
               onChange={handleChange}
             >
-              <option value="">Select price range...</option>
+              <option value="">Select price range</option>
               {PRICE_RANGES.map((p) => (
                 <option key={p} value={p}>
                   {p}
@@ -173,7 +174,7 @@ function SubmitForm({ onSubmit }) {
               ))}
             </select>
             {errors.priceRange && (
-              <span style={{ color: "red", fontSize: "0.9rem" }}>
+              <span style={{ color: "#ff385c", fontSize: "0.875rem" }}>
                 {errors.priceRange}
               </span>
             )}
@@ -182,13 +183,13 @@ function SubmitForm({ onSubmit }) {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Quarter *</label>
+            <label>QUARTER *</label>
             <select
               name="quarter"
               value={formData.quarter}
               onChange={handleChange}
             >
-              <option value="">Select quarter...</option>
+              <option value="">Select quarter</option>
               {QUARTERS.map((q) => (
                 <option key={q} value={q}>
                   {q}
@@ -196,20 +197,20 @@ function SubmitForm({ onSubmit }) {
               ))}
             </select>
             {errors.quarter && (
-              <span style={{ color: "red", fontSize: "0.9rem" }}>
+              <span style={{ color: "#ff385c", fontSize: "0.875rem" }}>
                 {errors.quarter}
               </span>
             )}
           </div>
 
           <div className="form-group">
-            <label>Room Type *</label>
+            <label>ROOM TYPE *</label>
             <select
               name="roomType"
               value={formData.roomType}
               onChange={handleChange}
             >
-              <option value="">Select room type...</option>
+              <option value="">Select room type</option>
               {ROOM_TYPES.map((r) => (
                 <option key={r} value={r}>
                   {r}
@@ -217,7 +218,7 @@ function SubmitForm({ onSubmit }) {
               ))}
             </select>
             {errors.roomType && (
-              <span style={{ color: "red", fontSize: "0.9rem" }}>
+              <span style={{ color: "#ff385c", fontSize: "0.875rem" }}>
                 {errors.roomType}
               </span>
             )}
@@ -225,33 +226,33 @@ function SubmitForm({ onSubmit }) {
         </div>
 
         <div className="form-group">
-          <label>Dates *</label>
+          <label>DATES *</label>
           <input
             type="text"
             name="dates"
             value={formData.dates}
             onChange={handleChange}
-            placeholder="e.g., March 25 - June 10"
+            placeholder="March 25 - June 10"
           />
           {errors.dates && (
-            <span style={{ color: "red", fontSize: "0.9rem" }}>
+            <span style={{ color: "#ff385c", fontSize: "0.875rem" }}>
               {errors.dates}
             </span>
           )}
         </div>
 
         <div className="form-group">
-          <label>Additional Notes</label>
+          <label>ADDITIONAL DETAILS</label>
           <textarea
             name="notes"
             value={formData.notes}
             onChange={handleChange}
-            placeholder="Any additional details (furnished, pets, parking, etc.)"
+            placeholder="Tell us more about the space - amenities, furnishing, pets, parking, etc."
           />
         </div>
 
         <button type="submit" className="submit-btn">
-          Post Signal
+          Publish Listing
         </button>
       </form>
     </div>

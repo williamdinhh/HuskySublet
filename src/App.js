@@ -13,11 +13,21 @@ function App() {
     setActiveTab("browse"); // Switch to browse after posting
   };
 
+  const handleDelete = (signalId) => {
+    if (window.confirm("Are you sure you want to delete this listing?")) {
+      setSignals((prev) => prev.filter((signal) => signal.id !== signalId));
+    }
+  };
+
   return (
     <div className="App">
       <header className="header">
-        <h1>🐺 Husky Sublet Signal</h1>
-        <p>Quick sublet posting and browsing for UW students</p>
+        <div className="header-content">
+          <div>
+            <h1>🐺 Husky Sublet</h1>
+            <p>Find your perfect UW sublet</p>
+          </div>
+        </div>
       </header>
 
       <div className="container">
@@ -26,18 +36,18 @@ function App() {
             className={`tab ${activeTab === "browse" ? "active" : ""}`}
             onClick={() => setActiveTab("browse")}
           >
-            Browse Signals ({signals.length})
+            Explore ({signals.length})
           </button>
           <button
             className={`tab ${activeTab === "post" ? "active" : ""}`}
             onClick={() => setActiveTab("post")}
           >
-            Post a Signal
+            List Your Place
           </button>
         </div>
 
         {activeTab === "browse" ? (
-          <SignalList signals={signals} />
+          <SignalList signals={signals} onDelete={handleDelete} />
         ) : (
           <SubmitForm onSubmit={handleSubmit} />
         )}

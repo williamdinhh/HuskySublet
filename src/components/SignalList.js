@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NEIGHBORHOODS, PRICE_RANGES, QUARTERS } from "../data";
 
-function SignalList({ signals }) {
+function SignalList({ signals, onDelete }) {
   const [filters, setFilters] = useState({
     quarter: "",
     priceRange: "",
@@ -82,49 +82,55 @@ function SignalList({ signals }) {
 
       {filteredSignals.length === 0 ? (
         <div className="no-results">
-          <p>No signals found matching your filters.</p>
-          <p>Try adjusting your search criteria.</p>
+          <p>No listings found</p>
+          <p>Try adjusting your filters to see more results</p>
         </div>
       ) : (
         <div className="signals-grid">
           {filteredSignals.map((signal) => (
             <div key={signal.id} className={`signal-card ${signal.type}`}>
-              <div className="signal-header">
-                <div className="signal-name">{signal.name}</div>
-                <span className={`signal-type-badge ${signal.type}`}>
-                  {signal.type === "offering" ? "🏠 Offering" : "🔍 Looking"}
-                </span>
+              <div className="signal-card-image">
+                {signal.type === "offering" ? "🏠" : "🔍"}
               </div>
+              <div className="signal-card-content">
+                <div className="signal-header">
+                  <div>
+                    <div className="signal-name">{signal.name}</div>
+                    <div className="signal-location">
+                      📍 {signal.neighborhood}
+                    </div>
+                  </div>
+                  <span className={`signal-type-badge ${signal.type}`}>
+                    {signal.type === "offering" ? "Available" : "Seeking"}
+                  </span>
+                </div>
 
-              <div className="signal-detail">
-                <strong>Neighborhood:</strong> {signal.neighborhood}
-              </div>
+                <div className="signal-price">{signal.priceRange}</div>
+                <div className="signal-dates">📅 {signal.dates}</div>
 
-              <div className="signal-detail">
-                <strong>Price:</strong> {signal.priceRange}
-              </div>
+                <div className="signal-detail">
+                  <strong>Room:</strong> {signal.roomType}
+                </div>
 
-              <div className="signal-detail">
-                <strong>Quarter:</strong> {signal.quarter}
-              </div>
+                <div className="signal-detail">
+                  <strong>Quarter:</strong> {signal.quarter}
+                </div>
 
-              <div className="signal-detail">
-                <strong>Dates:</strong> {signal.dates}
-              </div>
+                {signal.notes && (
+                  <div className="signal-notes">{signal.notes}</div>
+                )}
 
-              <div className="signal-detail">
-                <strong>Room Type:</strong> {signal.roomType}
-              </div>
+                <div className="signal-contact">
+                  <strong>✉️</strong> {signal.email}
+                </div>
 
-              {signal.notes && (
-                <div className="signal-notes">"{signal.notes}"</div>
-              )}
-
-              <div
-                className="signal-detail"
-                style={{ marginTop: "1rem", fontSize: "0.9rem" }}
-              >
-                <strong>Contact:</strong> {signal.email}
+                <button
+                  className="delete-btn"
+                  onClick={() => onDelete(signal.id)}
+                  title="Delete this listing"
+                >
+                  🗑️ Delete
+                </button>
               </div>
             </div>
           ))}
