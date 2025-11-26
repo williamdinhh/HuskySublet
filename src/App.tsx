@@ -18,11 +18,16 @@ interface Sublet {
   promptQuestion: string;
   promptAnswer: string;
   email: string;
+  images: string[];
 }
 
 // ============================================================================
 // SAMPLE DATA - Hard-coded sublets for demo
 // ============================================================================
+
+// Generate placeholder image URLs (using Unsplash for property-like images)
+const getPlaceholderImage = (seed: string) =>
+  `https://source.unsplash.com/600x400/?apartment,room&sig=${seed}`;
 
 const SAMPLE_SUBLETS: Sublet[] = [
   {
@@ -37,6 +42,11 @@ const SAMPLE_SUBLETS: Sublet[] = [
     promptAnswer:
       "Right next to campus with a rooftop view of Mount Rainier. Plus, my cat Oliver will be here to greet you!",
     email: "alex.chen@uw.edu",
+    images: [
+      getPlaceholderImage("1"),
+      getPlaceholderImage("1a"),
+      getPlaceholderImage("1b"),
+    ],
   },
   {
     id: "2",
@@ -50,6 +60,7 @@ const SAMPLE_SUBLETS: Sublet[] = [
     promptAnswer:
       "Someone who loves exploring local coffee shops and doesn't mind the occasional house party! Weekend brunch enthusiast a plus.",
     email: "sarah.m@uw.edu",
+    images: [getPlaceholderImage("2"), getPlaceholderImage("2a")],
   },
   {
     id: "3",
@@ -63,6 +74,12 @@ const SAMPLE_SUBLETS: Sublet[] = [
     promptAnswer:
       "BBQs in the backyard, board game nights, and walks to the light rail. We're pretty low-key but always down to hang.",
     email: "mike.johnson@uw.edu",
+    images: [
+      getPlaceholderImage("3"),
+      getPlaceholderImage("3a"),
+      getPlaceholderImage("3b"),
+      getPlaceholderImage("3c"),
+    ],
   },
   {
     id: "4",
@@ -76,6 +93,7 @@ const SAMPLE_SUBLETS: Sublet[] = [
     promptAnswer:
       "A quiet, responsible student. I have finals so need someone respectful of study time. Fully furnished with a desk!",
     email: "emily.wang@uw.edu",
+    images: [getPlaceholderImage("4"), getPlaceholderImage("4a")],
   },
   {
     id: "5",
@@ -89,6 +107,13 @@ const SAMPLE_SUBLETS: Sublet[] = [
     promptAnswer:
       "1) Floor-to-ceiling windows 2) Building has a gym and rooftop deck 3) Walking distance to Pike Place Market",
     email: "david.kim@uw.edu",
+    images: [
+      getPlaceholderImage("5"),
+      getPlaceholderImage("5a"),
+      getPlaceholderImage("5b"),
+      getPlaceholderImage("5c"),
+      getPlaceholderImage("5d"),
+    ],
   },
   {
     id: "6",
@@ -102,6 +127,11 @@ const SAMPLE_SUBLETS: Sublet[] = [
     promptAnswer:
       "PhD students in STEM fields. Lots of late-night study sessions, espresso machine always running, and indoor plants everywhere.",
     email: "lisa.patel@uw.edu",
+    images: [
+      getPlaceholderImage("6"),
+      getPlaceholderImage("6a"),
+      getPlaceholderImage("6b"),
+    ],
   },
   {
     id: "7",
@@ -115,6 +145,7 @@ const SAMPLE_SUBLETS: Sublet[] = [
     promptAnswer:
       "Total privacy with your own entrance and parking spot. Plus, the landlord upstairs makes amazing cookies and shares them!",
     email: "james.lee@uw.edu",
+    images: [getPlaceholderImage("7"), getPlaceholderImage("7a")],
   },
   {
     id: "8",
@@ -128,6 +159,12 @@ const SAMPLE_SUBLETS: Sublet[] = [
       "Exposed brick, huge windows, and an artsy neighborhood. I'm a painter so there's lots of natural light and creative energy.",
     promptQuestion: "What's your space like?",
     email: "maya.rodriguez@uw.edu",
+    images: [
+      getPlaceholderImage("8"),
+      getPlaceholderImage("8a"),
+      getPlaceholderImage("8b"),
+      getPlaceholderImage("8c"),
+    ],
   },
 ];
 
@@ -158,6 +195,12 @@ function App() {
   // View mode: 'browse' or 'saved'
   const [viewMode, setViewMode] = useState<"browse" | "saved">("browse");
 
+  // Filter drawer state
+  const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
+
+  // Current image index for image gallery
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+
   // Simple swipe/drag state
   const [dragX, setDragX] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -167,6 +210,11 @@ function App() {
   const touchStartX = useRef<number | null>(null);
   const mouseStartX = useRef<number | null>(null);
   const dragXRef = useRef<number>(0);
+
+  // Image swipe state
+  const [imageDragX, setImageDragX] = useState<number>(0);
+  const [isImageDragging, setIsImageDragging] = useState<boolean>(false);
+  const imageTouchStartX = useRef<number | null>(null);
 
   // ----------------------------------------------------------------------------
   // FILTERED SUBLETS - Compute based on filters
@@ -270,44 +318,85 @@ function App() {
     setDragX(0);
     setIsDragging(false);
     setSwipeClass("");
+    setCurrentImageIndex(0);
   };
 
-  // Keyboard shortcuts: Left = Pass, Right = Interested
+  // Reset image index when card changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [currentIndex]);
+
+  // Keyboard shortcuts: Left = Pass, Right = Interested, Left/Right arrows for image navigation when holding Shift
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (viewMode !== "browse") return;
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        // quick swipe-left animation
-        setSwipeClass("swipe-left");
-        setTimeout(() => {
-          setSwipeClass("");
-          handlePass();
-        }, 200);
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        handleInterested();
+      if (viewMode !== "browse" || !currentSublet) return;
+
+      // Image navigation with Shift + Arrow keys
+      if (
+        e.shiftKey &&
+        currentSublet.images &&
+        currentSublet.images.length > 1
+      ) {
+        if (e.key === "ArrowLeft" && currentImageIndex > 0) {
+          e.preventDefault();
+          setCurrentImageIndex(currentImageIndex - 1);
+          return;
+        } else if (
+          e.key === "ArrowRight" &&
+          currentImageIndex < currentSublet.images.length - 1
+        ) {
+          e.preventDefault();
+          setCurrentImageIndex(currentImageIndex + 1);
+          return;
+        }
+      }
+
+      // Card navigation (only if not navigating images)
+      if (!e.shiftKey) {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          // quick swipe-left animation
+          setSwipeClass("swipe-left");
+          setTimeout(() => {
+            setSwipeClass("");
+            handlePass();
+          }, 200);
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          handleInterested();
+        }
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [viewMode, currentIndex, filteredSublets.length, likedSublets]);
+  }, [
+    viewMode,
+    currentIndex,
+    filteredSublets.length,
+    likedSublets,
+    currentSublet,
+    currentImageIndex,
+  ]);
 
-  // Touch handlers for simple swipe
+  // Touch handlers for card swipe (excluding image area)
   const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // Don't start card swipe if touching image area
+    const target = e.target as HTMLElement;
+    if (target.closest(".card-image-container")) return;
+
     touchStartX.current = e.touches[0].clientX;
     setIsDragging(true);
   };
 
   const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (touchStartX.current == null) return;
+    if (touchStartX.current == null || isImageDragging) return;
     const deltaX = e.touches[0].clientX - touchStartX.current;
     setDragX(deltaX);
     dragXRef.current = deltaX;
   };
 
   const onTouchEnd = () => {
-    if (!isDragging) return;
+    if (!isDragging || isImageDragging) return;
     const threshold = 80;
     if (dragX < -threshold) {
       // Swipe left => pass
@@ -330,6 +419,57 @@ function App() {
       setIsDragging(false);
     }
     touchStartX.current = null;
+  };
+
+  // Image swipe handlers
+  const onImageTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (
+      !currentSublet ||
+      !currentSublet.images ||
+      currentSublet.images.length <= 1
+    )
+      return;
+    imageTouchStartX.current = e.touches[0].clientX;
+    setIsImageDragging(true);
+  };
+
+  const onImageTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (imageTouchStartX.current == null || !isImageDragging) return;
+    const deltaX = e.touches[0].clientX - imageTouchStartX.current;
+    setImageDragX(deltaX);
+  };
+
+  const onImageTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (
+      !isImageDragging ||
+      !currentSublet ||
+      !currentSublet.images ||
+      currentSublet.images.length <= 1
+    ) {
+      setIsImageDragging(false);
+      setImageDragX(0);
+      imageTouchStartX.current = null;
+      return;
+    }
+
+    const threshold = 50;
+    if (
+      imageDragX < -threshold &&
+      currentImageIndex < currentSublet.images.length - 1
+    ) {
+      // Swipe left => next image
+      setCurrentImageIndex(currentImageIndex + 1);
+    } else if (imageDragX > threshold && currentImageIndex > 0) {
+      // Swipe right => previous image
+      setCurrentImageIndex(currentImageIndex - 1);
+    }
+
+    setImageDragX(0);
+    setIsImageDragging(false);
+    imageTouchStartX.current = null;
   };
 
   // Desktop mouse drag handlers
@@ -377,11 +517,21 @@ function App() {
   // RENDER
   // ----------------------------------------------------------------------------
 
+  // Format date helper
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="app">
       {/* TOP BAR */}
       <header className="top-bar">
-        <h1 className="app-title">🐺 HuskySublet</h1>
+        <h1 className="app-title">HuskySublet</h1>
         <div className="view-toggle">
           <button
             className={viewMode === "browse" ? "active" : ""}
@@ -398,104 +548,139 @@ function App() {
         </div>
       </header>
 
-      <div className="main-content">
-        {viewMode === "browse" ? (
-          <>
-            {/* LEFT SIDEBAR - FILTERS */}
-            <aside className="filters-sidebar">
-              <h2>Filters</h2>
+      {/* FILTERS DRAWER */}
+      <div
+        className={`filters-drawer-overlay ${filtersOpen ? "show" : ""}`}
+        onClick={() => setFiltersOpen(false)}
+      />
+      <aside className={`filters-drawer ${filtersOpen ? "open" : ""}`}>
+        <div className="filters-drawer-header">
+          <h2>Filters</h2>
+          <button
+            className="close-filters"
+            onClick={() => setFiltersOpen(false)}
+            aria-label="Close filters"
+          >
+            ×
+          </button>
+        </div>
 
-              {/* Price Filter */}
-              <div className="filter-group">
-                <label htmlFor="max-price">Max Price: ${maxPrice}</label>
+        {/* Price Filter */}
+        <div className="filter-group">
+          <label htmlFor="max-price">Max Price: ${maxPrice}</label>
+          <input
+            id="max-price"
+            type="range"
+            min="500"
+            max="2000"
+            step="50"
+            value={maxPrice}
+            onChange={(e) => {
+              setMaxPrice(Number(e.target.value));
+              resetToStart();
+            }}
+          />
+        </div>
+
+        {/* Neighborhood Filter */}
+        <div className="filter-group">
+          <label htmlFor="neighborhood">Neighborhood</label>
+          <select
+            id="neighborhood"
+            value={selectedNeighborhood}
+            onChange={(e) => {
+              setSelectedNeighborhood(e.target.value);
+              resetToStart();
+            }}
+          >
+            <option value="All">All</option>
+            <option value="U-District">U-District</option>
+            <option value="Capitol Hill">Capitol Hill</option>
+            <option value="Northgate">Northgate</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {/* Vibe Filter */}
+        <div className="filter-group">
+          <label>Vibes</label>
+          <div className="vibe-checkboxes">
+            {allVibes.map((vibe) => (
+              <label key={vibe} className="checkbox-label">
                 <input
-                  id="max-price"
-                  type="range"
-                  min="500"
-                  max="2000"
-                  step="50"
-                  value={maxPrice}
-                  onChange={(e) => {
-                    setMaxPrice(Number(e.target.value));
+                  type="checkbox"
+                  checked={selectedVibes.includes(vibe)}
+                  onChange={() => {
+                    handleVibeToggle(vibe);
                     resetToStart();
                   }}
                 />
-              </div>
+                {vibe}
+              </label>
+            ))}
+          </div>
+        </div>
 
-              {/* Neighborhood Filter */}
-              <div className="filter-group">
-                <label htmlFor="neighborhood">Neighborhood</label>
-                <select
-                  id="neighborhood"
-                  value={selectedNeighborhood}
-                  onChange={(e) => {
-                    setSelectedNeighborhood(e.target.value);
-                    resetToStart();
-                  }}
-                >
-                  <option value="All">All</option>
-                  <option value="U-District">U-District</option>
-                  <option value="Capitol Hill">Capitol Hill</option>
-                  <option value="Northgate">Northgate</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
+        <div className="filter-summary">
+          Showing {filteredSublets.length} sublet
+          {filteredSublets.length !== 1 ? "s" : ""}
+        </div>
+      </aside>
 
-              {/* Vibe Filter */}
-              <div className="filter-group">
-                <label>Vibes</label>
-                <div className="vibe-checkboxes">
-                  {allVibes.map((vibe) => (
-                    <label key={vibe} className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={selectedVibes.includes(vibe)}
-                        onChange={() => {
-                          handleVibeToggle(vibe);
-                          resetToStart();
-                        }}
-                      />
-                      {vibe}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="filter-summary">
-                Showing {filteredSublets.length} sublet
-                {filteredSublets.length !== 1 ? "s" : ""}
-              </div>
-            </aside>
+      <div className="main-content">
+        {viewMode === "browse" ? (
+          <>
+            {/* FILTER BUTTON */}
+            <button
+              className="filter-button"
+              onClick={() => setFiltersOpen(true)}
+              aria-label="Open filters"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+            </button>
 
             {/* MAIN CARD AREA */}
             <main className="card-area">
               {currentSublet ? (
                 <div className="card-stack">
+                  {/* Behind card preview */}
                   {filteredSublets[currentIndex + 1] && (
                     <div
                       className="profile-card behind"
                       aria-hidden
                       style={{
                         transform: `scale(${
-                          0.98 + Math.min(Math.abs(dragX) / 600, 0.04)
+                          0.96 + Math.min(Math.abs(dragX) / 600, 0.03)
                         }) translateY(8px) translateX(${-dragX * 0.04}px)`,
-                        opacity: 0.7,
+                        opacity: 0.6,
                       }}
                     >
-                      <h2 className="card-title">
-                        {filteredSublets[currentIndex + 1].title}
-                      </h2>
-                      <div className="card-info">
-                        <div className="info-item">
-                          <span className="info-label">Price:</span>
-                          <span className="info-value">
-                            ${filteredSublets[currentIndex + 1].price}/month
-                          </span>
-                        </div>
+                      <div className="card-image-container">
+                        {filteredSublets[currentIndex + 1].images[0] ? (
+                          <img
+                            src={filteredSublets[currentIndex + 1].images[0]}
+                            alt={filteredSublets[currentIndex + 1].title}
+                            className="card-image"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="image-placeholder">🏠</div>
+                        )}
                       </div>
                     </div>
                   )}
 
+                  {/* Main card */}
                   <div
                     className={`profile-card ${swipeClass} ${
                       isDragging ? "dragging" : ""
@@ -508,9 +693,12 @@ function App() {
                       transform: isDragging
                         ? `translateX(${dragX}px) rotate(${dragX / 25}deg)`
                         : undefined,
-                      transition: isDragging ? "none" : "transform 0.2s ease",
+                      transition: isDragging
+                        ? "none"
+                        : "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                     }}
                   >
+                    {/* Swipe badges */}
                     <div
                       className={`swipe-badge pass ${
                         isDragging && dragX < -20 ? "show" : ""
@@ -527,112 +715,161 @@ function App() {
                     >
                       LIKE
                     </div>
-                    {/* Title */}
-                    <h2 className="card-title">{currentSublet.title}</h2>
 
-                    {/* Price, Neighborhood, Dates */}
-                    <div className="card-info">
-                      <div className="info-item">
-                        <span className="info-label">Price:</span>
-                        <span className="info-value">
-                          ${currentSublet.price}/month
-                        </span>
-                      </div>
-                      <div className="info-item">
-                        <span className="info-label">Location:</span>
-                        <span className="info-value">
-                          {currentSublet.neighborhood}
-                        </span>
-                      </div>
-                      <div className="info-item">
-                        <span className="info-label">Dates:</span>
-                        <span className="info-value">
-                          {currentSublet.startDate} to {currentSublet.endDate}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Vibe Tags */}
-                    <div className="vibe-tags">
-                      {currentSublet.vibes.map((vibe) => (
-                        <span key={vibe} className="vibe-badge">
-                          {vibe}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Prompt Question & Answer */}
-                    <div className="prompt-section">
-                      <div className="prompt-question">
-                        {currentSublet.promptQuestion}
-                      </div>
-                      <div className="prompt-answer">
-                        {currentSublet.promptAnswer}
-                      </div>
-                    </div>
-
-                    {/* Email (only shown after "Interested" is clicked) */}
-                    {showEmail && (
-                      <div className="email-reveal">
-                        ✉️ Contact: <strong>{currentSublet.email}</strong>
-                      </div>
-                    )}
-
-                    {/* Action Buttons */}
-                    <div className="action-buttons">
-                      <button
-                        className="circle-btn pass-btn"
-                        onClick={handlePass}
-                        aria-label="Pass"
-                      >
-                        <svg
-                          width="28"
-                          height="28"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M6 6l12 12M18 6L6 18"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        className="circle-btn interested-btn"
-                        onClick={handleInterested}
-                        aria-label="Interested"
-                      >
-                        <svg
-                          width="28"
-                          height="28"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M12 21s-6.5-4.35-9-8.1C1.2 10.2 2.1 7.5 4.5 6.3 6.4 5.3 8.7 6 10 7.6c1.3-1.6 3.6-2.3 5.5-1.3 2.4 1.2 3.3 3.9 1.5 6.6-2.5 3.75-9 8.1-9 8.1z"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            fill="currentColor"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Card Counter */}
+                    {/* Card counter */}
                     <div className="card-counter">
                       {currentIndex + 1} / {filteredSublets.length}
+                    </div>
+
+                    {/* Image Gallery */}
+                    <div
+                      className="card-image-container"
+                      onTouchStart={onImageTouchStart}
+                      onTouchMove={onImageTouchMove}
+                      onTouchEnd={onImageTouchEnd}
+                      style={{
+                        transform: isImageDragging
+                          ? `translateX(${imageDragX}px)`
+                          : undefined,
+                        transition: isImageDragging
+                          ? "none"
+                          : "transform 0.3s ease",
+                      }}
+                    >
+                      {currentSublet.images &&
+                      currentSublet.images.length > 0 ? (
+                        <>
+                          <img
+                            src={
+                              currentSublet.images[currentImageIndex] ||
+                              currentSublet.images[0]
+                            }
+                            alt={currentSublet.title}
+                            className="card-image"
+                            loading="lazy"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = "none";
+                              if (!img.nextElementSibling) {
+                                const placeholder =
+                                  document.createElement("div");
+                                placeholder.className = "image-placeholder";
+                                placeholder.textContent = "🏠";
+                                img.parentElement?.appendChild(placeholder);
+                              }
+                            }}
+                          />
+                          {currentSublet.images.length > 1 && (
+                            <div className="image-counter">
+                              {currentImageIndex + 1} /{" "}
+                              {currentSublet.images.length}
+                            </div>
+                          )}
+                          {/* Image navigation dots */}
+                          {currentSublet.images.length > 1 && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                bottom: "12px",
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                                display: "flex",
+                                gap: "6px",
+                                zIndex: 2,
+                              }}
+                            >
+                              {currentSublet.images.map((_, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentImageIndex(idx);
+                                  }}
+                                  style={{
+                                    width:
+                                      idx === currentImageIndex
+                                        ? "24px"
+                                        : "8px",
+                                    height: "8px",
+                                    borderRadius: "4px",
+                                    border: "none",
+                                    background:
+                                      idx === currentImageIndex
+                                        ? "white"
+                                        : "rgba(255, 255, 255, 0.5)",
+                                    cursor: "pointer",
+                                    transition: "all 0.2s ease",
+                                    padding: 0,
+                                  }}
+                                  aria-label={`Go to image ${idx + 1}`}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="image-placeholder">🏠</div>
+                      )}
+                    </div>
+
+                    {/* Scrollable card content */}
+                    <div className="card-content">
+                      {/* Header */}
+                      <div className="card-header">
+                        <h2 className="card-title">{currentSublet.title}</h2>
+                        <div className="card-price">
+                          ${currentSublet.price}/month
+                        </div>
+                      </div>
+
+                      {/* Info rows */}
+                      <div className="card-info">
+                        <div className="info-row">
+                          <span className="info-label">Location</span>
+                          <span className="info-value">
+                            {currentSublet.neighborhood}
+                          </span>
+                        </div>
+                        <div className="info-row">
+                          <span className="info-label">Available</span>
+                          <span className="info-value">
+                            {formatDate(currentSublet.startDate)} -{" "}
+                            {formatDate(currentSublet.endDate)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Vibe Tags */}
+                      <div className="vibe-tags">
+                        {currentSublet.vibes.map((vibe) => (
+                          <span key={vibe} className="vibe-badge">
+                            {vibe}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Prompt Section */}
+                      <div className="prompt-section">
+                        <div className="prompt-question">
+                          {currentSublet.promptQuestion}
+                        </div>
+                        <div className="prompt-answer">
+                          {currentSublet.promptAnswer}
+                        </div>
+                      </div>
+
+                      {/* Email reveal */}
+                      {showEmail && (
+                        <div className="email-reveal">
+                          ✉️ Contact: <strong>{currentSublet.email}</strong>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="no-more-message">
-                  <h2>No more sublets match your filters! 🎉</h2>
+                  <h2>No more sublets match your filters!</h2>
                   <p>
                     Try adjusting your filters or check your saved listings.
                   </p>
@@ -642,6 +879,35 @@ function App() {
                 </div>
               )}
             </main>
+
+            {/* BOTTOM ACTION BAR */}
+            {viewMode === "browse" && currentSublet && (
+              <div className="bottom-action-bar">
+                <button
+                  className="action-button pass-button"
+                  onClick={handlePass}
+                  aria-label="Pass"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+                <button
+                  className="action-button like-button"
+                  onClick={handleInterested}
+                  aria-label="Interested"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    stroke="currentColor"
+                  >
+                    <path d="M12 21s-8-4.5-8-11.8A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 8 3.2C20 16.5 12 21 12 21z"></path>
+                  </svg>
+                </button>
+              </div>
+            )}
           </>
         ) : (
           /* SAVED VIEW */
@@ -672,8 +938,9 @@ function App() {
                         <strong>Location:</strong> {sublet.neighborhood}
                       </p>
                       <p>
-                        <strong>Dates:</strong> {sublet.startDate} to{" "}
-                        {sublet.endDate}
+                        <strong>Available:</strong>{" "}
+                        {formatDate(sublet.startDate)} -{" "}
+                        {formatDate(sublet.endDate)}
                       </p>
                       <p>
                         <strong>Contact:</strong> {sublet.email}
