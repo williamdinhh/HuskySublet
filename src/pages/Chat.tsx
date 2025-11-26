@@ -213,22 +213,54 @@ export default function Chat() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div
-                      style={{
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        background: '#007AFF',
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: '600',
-                        fontSize: '1.25rem',
-                      }}
-                    >
-                      {otherUser?.name?.[0]?.toUpperCase() || '?'}
-                    </div>
+                    {otherUser?.profileImage ? (
+                      <img
+                        src={otherUser.profileImage}
+                        alt={otherUser.name}
+                        style={{
+                          width: '50px',
+                          height: '50px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                        }}
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.style.display = 'none';
+                          if (!img.nextElementSibling) {
+                            const placeholder = document.createElement("div");
+                            placeholder.style.width = '50px';
+                            placeholder.style.height = '50px';
+                            placeholder.style.borderRadius = '50%';
+                            placeholder.style.background = '#007AFF';
+                            placeholder.style.color = 'white';
+                            placeholder.style.display = 'flex';
+                            placeholder.style.alignItems = 'center';
+                            placeholder.style.justifyContent = 'center';
+                            placeholder.style.fontWeight = '600';
+                            placeholder.style.fontSize = '1.25rem';
+                            placeholder.textContent = otherUser?.name?.[0]?.toUpperCase() || '?';
+                            img.parentElement?.appendChild(placeholder);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: '50px',
+                          height: '50px',
+                          borderRadius: '50%',
+                          background: '#007AFF',
+                          color: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: '600',
+                          fontSize: '1.25rem',
+                        }}
+                      >
+                        {otherUser?.name?.[0]?.toUpperCase() || '?'}
+                      </div>
+                    )}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: '600', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {otherUser?.name || 'Unknown'}
@@ -253,21 +285,52 @@ export default function Chat() {
           <>
             {/* Chat Header */}
             <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: '#007AFF',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '600',
-                }}
-              >
-                {getOtherUser(selectedMatch)?.name?.[0]?.toUpperCase() || '?'}
-              </div>
+              {getOtherUser(selectedMatch)?.profileImage ? (
+                <img
+                  src={getOtherUser(selectedMatch)?.profileImage}
+                  alt={getOtherUser(selectedMatch)?.name}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                  }}
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.style.display = 'none';
+                    if (!img.nextElementSibling) {
+                      const placeholder = document.createElement("div");
+                      placeholder.style.width = '40px';
+                      placeholder.style.height = '40px';
+                      placeholder.style.borderRadius = '50%';
+                      placeholder.style.background = '#007AFF';
+                      placeholder.style.color = 'white';
+                      placeholder.style.display = 'flex';
+                      placeholder.style.alignItems = 'center';
+                      placeholder.style.justifyContent = 'center';
+                      placeholder.style.fontWeight = '600';
+                      placeholder.textContent = getOtherUser(selectedMatch)?.name?.[0]?.toUpperCase() || '?';
+                      img.parentElement?.appendChild(placeholder);
+                    }
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: '#007AFF',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '600',
+                  }}
+                >
+                  {getOtherUser(selectedMatch)?.name?.[0]?.toUpperCase() || '?'}
+                </div>
+              )}
               <div>
                 <div style={{ fontWeight: '600' }}>{getOtherUser(selectedMatch)?.name || 'Unknown'}</div>
                 {typeof selectedMatch.listingId === 'object' && (

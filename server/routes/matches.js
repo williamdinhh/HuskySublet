@@ -15,14 +15,34 @@ const router = express.Router();
 // Helper to populate match with user and listing info
 const populateMatch = async (match) => {
   const users = await Promise.all(match.users.map(id => findUserById(id)));
-  const listing = await findListingById(match.listingId);
+  
+  // Check if listingId is a dummy buyer listing ID
+  let listing = null;
+  if (match.listingId && !match.listingId.startsWith('buyer-')) {
+    listing = await findListingById(match.listingId);
+  } else if (match.listingId && match.listingId.startsWith('buyer-')) {
+    // This is a buyer match, create a dummy listing object
+    const buyerId = match.listingId.replace('buyer-', '');
+    const buyer = await findUserById(buyerId);
+    if (buyer) {
+      listing = {
+        id: match.listingId,
+        _id: match.listingId,
+        title: `${buyer.name} is looking for a place`,
+        price: buyer.preferences?.priceRange?.max || 0,
+        neighborhood: buyer.preferences?.preferredLocations?.[0] || 'Any',
+      };
+    }
+  }
   
   return {
     ...match,
+    _id: match.id, // Add _id for frontend compatibility
     users: users.filter(Boolean).map(u => ({
       id: u.id,
       name: u.name,
       email: u.email,
+      profileImage: u.profileImage || null,
     })),
     listingId: listing || match.listingId,
   };

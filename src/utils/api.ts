@@ -109,6 +109,16 @@ class ApiClient {
     return this.request<{ listings: Listing[] }>(endpoint);
   }
 
+  async getBuyers() {
+    return this.request<{ buyers: User[] }>('/listings/buyers');
+  }
+
+  async likeBuyer(buyerId: string) {
+    return this.request<{ match: Match; matched: boolean }>(`/listings/buyers/${buyerId}/like`, {
+      method: 'POST',
+    });
+  }
+
   async getMyListings() {
     return this.request<{ listings: Listing[] }>('/listings/my-listings');
   }
@@ -187,6 +197,7 @@ export interface User {
   email: string;
   name: string;
   role?: 'buyer' | 'seller' | 'both';
+  profileImage?: string;
   preferences?: UserPreferences;
 }
 

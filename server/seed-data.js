@@ -12,6 +12,16 @@ export async function seedDatabase() {
     return;
   }
 
+  // Helper to get profile image
+  const getProfileImage = (name, seed) => {
+    // Use UI Avatars or a similar service for profile pictures
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=400&background=667eea&color=fff&bold=true&font-size=0.5`;
+  };
+
+  // Helper to get apartment/room images
+  const getPlaceholderImage = (seed) =>
+    `https://source.unsplash.com/600x400/?apartment,room&sig=${seed}`;
+
   // Create sample users with different roles
   const sampleUsers = [
     {
@@ -19,48 +29,62 @@ export async function seedDatabase() {
       password: 'password123',
       name: 'Alex Chen',
       role: 'seller',
+      profileImage: getProfileImage('Alex Chen', 'alex'),
     },
     {
       email: 'sarah.m@uw.edu',
       password: 'password123',
       name: 'Sarah Martinez',
       role: 'seller',
+      profileImage: getProfileImage('Sarah Martinez', 'sarah'),
     },
     {
       email: 'mike.johnson@uw.edu',
       password: 'password123',
       name: 'Mike Johnson',
       role: 'both',
+      profileImage: getProfileImage('Mike Johnson', 'mike'),
     },
     {
       email: 'emily.wang@uw.edu',
       password: 'password123',
       name: 'Emily Wang',
       role: 'seller',
+      profileImage: getProfileImage('Emily Wang', 'emily'),
     },
     {
       email: 'david.kim@uw.edu',
       password: 'password123',
       name: 'David Kim',
       role: 'seller',
+      profileImage: getProfileImage('David Kim', 'david'),
     },
     {
       email: 'lisa.patel@uw.edu',
       password: 'password123',
       name: 'Lisa Patel',
       role: 'both',
+      profileImage: getProfileImage('Lisa Patel', 'lisa'),
     },
     {
       email: 'james.lee@uw.edu',
       password: 'password123',
       name: 'James Lee',
       role: 'buyer',
+      profileImage: getProfileImage('James Lee', 'james'),
+      preferences: {
+        priceRange: { min: 800, max: 1200 },
+        numRoommates: '1',
+        preferredGenders: ['Any'],
+        preferredLocations: ['U-District', 'Capitol Hill'],
+      },
     },
     {
       email: 'maya.rodriguez@uw.edu',
       password: 'password123',
       name: 'Maya Rodriguez',
       role: 'seller',
+      profileImage: getProfileImage('Maya Rodriguez', 'maya'),
     },
     // More buyers
     {
@@ -68,36 +92,78 @@ export async function seedDatabase() {
       password: 'password123',
       name: 'Ryan Park',
       role: 'buyer',
+      profileImage: getProfileImage('Ryan Park', 'ryan'),
+      preferences: {
+        priceRange: { min: 600, max: 1000 },
+        numRoommates: '2',
+        preferredGenders: ['Male'],
+        preferredLocations: ['U-District'],
+      },
     },
     {
       email: 'sophia.nguyen@uw.edu',
       password: 'password123',
       name: 'Sophia Nguyen',
       role: 'buyer',
+      profileImage: getProfileImage('Sophia Nguyen', 'sophia'),
+      preferences: {
+        priceRange: { min: 900, max: 1400 },
+        numRoommates: 'Any',
+        preferredGenders: ['Female', 'Any'],
+        preferredLocations: ['Capitol Hill', 'U-District'],
+      },
     },
     {
       email: 'chris.taylor@uw.edu',
       password: 'password123',
       name: 'Chris Taylor',
       role: 'buyer',
+      profileImage: getProfileImage('Chris Taylor', 'chris'),
+      preferences: {
+        priceRange: { min: 700, max: 1100 },
+        numRoommates: '1',
+        preferredGenders: ['Any'],
+        preferredLocations: ['Northgate', 'U-District'],
+      },
     },
     {
       email: 'jessica.wong@uw.edu',
       password: 'password123',
       name: 'Jessica Wong',
       role: 'buyer',
+      profileImage: getProfileImage('Jessica Wong', 'jessica'),
+      preferences: {
+        priceRange: { min: 1000, max: 1500 },
+        numRoommates: '0',
+        preferredGenders: ['Female'],
+        preferredLocations: ['Capitol Hill'],
+      },
     },
     {
       email: 'marcus.brown@uw.edu',
       password: 'password123',
       name: 'Marcus Brown',
       role: 'buyer',
+      profileImage: getProfileImage('Marcus Brown', 'marcus'),
+      preferences: {
+        priceRange: { min: 500, max: 900 },
+        numRoommates: '2',
+        preferredGenders: ['Any'],
+        preferredLocations: ['U-District', 'Northgate'],
+      },
     },
     {
       email: 'olivia.davis@uw.edu',
       password: 'password123',
       name: 'Olivia Davis',
       role: 'buyer',
+      profileImage: getProfileImage('Olivia Davis', 'olivia'),
+      preferences: {
+        priceRange: { min: 850, max: 1300 },
+        numRoommates: '1',
+        preferredGenders: ['Female', 'Non-binary'],
+        preferredLocations: ['Capitol Hill', 'U-District'],
+      },
     },
     // More sellers
     {
@@ -105,12 +171,14 @@ export async function seedDatabase() {
       password: 'password123',
       name: 'Jake Wilson',
       role: 'seller',
+      profileImage: getProfileImage('Jake Wilson', 'jake'),
     },
     {
       email: 'isabella.garcia@uw.edu',
       password: 'password123',
       name: 'Isabella Garcia',
       role: 'seller',
+      profileImage: getProfileImage('Isabella Garcia', 'isabella'),
     },
   ];
 
@@ -120,18 +188,22 @@ export async function seedDatabase() {
       // Check if user already exists
       const existing = await findUserByEmail(userData.email);
       if (existing) {
-        // Update existing user with role if missing
-        const updated = await updateUser(existing.id, { role: userData.role });
+        // Update existing user with role and preferences if missing
+        const updateData = { role: userData.role };
+        if (userData.preferences) {
+          updateData.preferences = userData.preferences;
+        }
+        const updated = await updateUser(existing.id, updateData);
         if (updated) {
-          console.log(`✅ Updated user role: ${existing.name} (${existing.email}) -> ${userData.role}`);
-          createdUsers.push({ ...existing, role: userData.role });
+          console.log(`✅ Updated user: ${existing.name} (${existing.email})`);
+          createdUsers.push({ ...existing, ...updateData });
         } else {
           createdUsers.push(existing);
         }
       } else {
         const user = await createUser({
           ...userData,
-          preferences: {
+          preferences: userData.preferences || {
             priceRange: { min: 0, max: 2000 },
             numRoommates: 'Any',
             preferredGenders: ['Any'],
@@ -146,9 +218,7 @@ export async function seedDatabase() {
     }
   }
 
-  // Create sample listings
-  const getPlaceholderImage = (seed) =>
-    `https://source.unsplash.com/600x400/?apartment,room&sig=${seed}`;
+  // Create sample listings (getPlaceholderImage already defined above)
 
   const sampleListings = [
     {
@@ -159,9 +229,9 @@ export async function seedDatabase() {
       startDate: new Date('2024-06-15').toISOString(),
       endDate: new Date('2024-08-31').toISOString(),
       images: [
-        getPlaceholderImage('1'),
-        getPlaceholderImage('1a'),
-        getPlaceholderImage('1b'),
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop',
       ],
       vibes: ['Quiet', 'Clean', 'Pet-friendly'],
       promptQuestion: 'What makes this place special?',
@@ -175,8 +245,8 @@ export async function seedDatabase() {
       startDate: new Date('2024-07-01').toISOString(),
       endDate: new Date('2024-09-15').toISOString(),
       images: [
-        getPlaceholderImage('2'),
-        getPlaceholderImage('2a'),
+        'https://images.unsplash.com/photo-1505843513577-22bb7d21e455?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop',
       ],
       vibes: ['Social', 'Modern', 'Near nightlife'],
       promptQuestion: 'Perfect roommate is...',
@@ -190,10 +260,10 @@ export async function seedDatabase() {
       startDate: new Date('2024-06-01').toISOString(),
       endDate: new Date('2024-08-20').toISOString(),
       images: [
-        getPlaceholderImage('3'),
-        getPlaceholderImage('3a'),
-        getPlaceholderImage('3b'),
-        getPlaceholderImage('3c'),
+        'https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1560448075-cbc16bb4af80?w=600&h=400&fit=crop',
       ],
       vibes: ['Chill', 'Spacious', 'Backyard'],
       promptQuestion: 'What\'s your ideal weekend?',
@@ -207,8 +277,8 @@ export async function seedDatabase() {
       startDate: new Date('2024-05-25').toISOString(),
       endDate: new Date('2024-09-01').toISOString(),
       images: [
-        getPlaceholderImage('4'),
-        getPlaceholderImage('4a'),
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&h=400&fit=crop',
       ],
       vibes: ['Quiet', 'Study-friendly', 'Furnished'],
       promptQuestion: 'What are you looking for in a subletter?',
@@ -222,11 +292,11 @@ export async function seedDatabase() {
       startDate: new Date('2024-06-10').toISOString(),
       endDate: new Date('2024-08-25').toISOString(),
       images: [
-        getPlaceholderImage('5'),
-        getPlaceholderImage('5a'),
-        getPlaceholderImage('5b'),
-        getPlaceholderImage('5c'),
-        getPlaceholderImage('5d'),
+        'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1560448204-61dc7191c0c2?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556912173-2e38e0e58b9a?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1560448076-0d0d494344a0?w=600&h=400&fit=crop',
       ],
       vibes: ['Modern', 'Bright', 'Gym access'],
       promptQuestion: 'Three things to know about this place',
@@ -240,9 +310,9 @@ export async function seedDatabase() {
       startDate: new Date('2024-06-20').toISOString(),
       endDate: new Date('2024-09-10').toISOString(),
       images: [
-        getPlaceholderImage('6'),
-        getPlaceholderImage('6a'),
-        getPlaceholderImage('6b'),
+        'https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&h=400&fit=crop',
       ],
       vibes: ['Academic', 'Collaborative', 'Plant-filled'],
       promptQuestion: 'What\'s the vibe of the house?',
@@ -256,10 +326,10 @@ export async function seedDatabase() {
       startDate: new Date('2024-06-15').toISOString(),
       endDate: new Date('2024-09-05').toISOString(),
       images: [
-        getPlaceholderImage('8'),
-        getPlaceholderImage('8a'),
-        getPlaceholderImage('8b'),
-        getPlaceholderImage('8c'),
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=600&h=400&fit=crop',
       ],
       vibes: ['Creative', 'Unique', 'Natural light'],
       promptQuestion: 'What\'s your space like?',
@@ -274,9 +344,9 @@ export async function seedDatabase() {
       startDate: new Date('2024-07-01').toISOString(),
       endDate: new Date('2024-09-30').toISOString(),
       images: [
-        getPlaceholderImage('9'),
-        getPlaceholderImage('9a'),
-        getPlaceholderImage('9b'),
+        'https://images.unsplash.com/photo-1505843513577-22bb7d21e455?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=600&h=400&fit=crop',
       ],
       vibes: ['Modern', 'Bright', 'Balcony'],
       promptQuestion: 'Best feature of this place?',
@@ -290,8 +360,8 @@ export async function seedDatabase() {
       startDate: new Date('2024-06-10').toISOString(),
       endDate: new Date('2024-08-31').toISOString(),
       images: [
-        getPlaceholderImage('10'),
-        getPlaceholderImage('10a'),
+        'https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=600&h=400&fit=crop',
       ],
       vibes: ['Spacious', 'Social', 'Furnished'],
       promptQuestion: 'What\'s the house like?',
@@ -305,9 +375,9 @@ export async function seedDatabase() {
       startDate: new Date('2024-07-15').toISOString(),
       endDate: new Date('2024-09-15').toISOString(),
       images: [
-        getPlaceholderImage('11'),
-        getPlaceholderImage('11a'),
-        getPlaceholderImage('11b'),
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&h=400&fit=crop',
       ],
       vibes: ['Private', 'Quiet', 'Parking included'],
       promptQuestion: 'Why choose this place?',
@@ -321,10 +391,10 @@ export async function seedDatabase() {
       startDate: new Date('2024-06-20').toISOString(),
       endDate: new Date('2024-10-01').toISOString(),
       images: [
-        getPlaceholderImage('12'),
-        getPlaceholderImage('12a'),
-        getPlaceholderImage('12b'),
-        getPlaceholderImage('12c'),
+        'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1560448204-61dc7191c0c2?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1556912173-2e38e0e58b9a?w=600&h=400&fit=crop',
       ],
       vibes: ['Modern', 'Gym access', 'Rooftop'],
       promptQuestion: 'What amenities are included?',

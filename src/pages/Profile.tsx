@@ -67,9 +67,12 @@ export default function Profile() {
       return;
     }
     try {
-      await api.deleteListing(id);
-      setMyListings(myListings.filter(l => l._id !== id));
+      // Use _id if available, otherwise use id
+      const listingId = id || (myListings.find(l => l._id === id)?._id) || (myListings.find(l => (l as any).id === id)?.(l as any).id);
+      await api.deleteListing(listingId);
+      setMyListings(myListings.filter(l => l._id !== id && (l as any).id !== id));
       alert('Listing deleted successfully!');
+      loadMyListings(); // Reload to ensure sync
     } catch (err: any) {
       alert(err.message || 'Failed to delete listing');
     }
@@ -724,7 +727,7 @@ export default function Profile() {
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDeleteListing(listing._id)}
+                          onClick={() => handleDeleteListing(listing._id || (listing as any).id)}
                           style={{
                             padding: '0.5rem 1rem',
                             background: '#FF3B30',

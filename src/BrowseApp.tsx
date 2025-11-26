@@ -192,6 +192,7 @@ export default function BrowseApp() {
 
   // Listings from API
   const [listings, setListings] = useState<Listing[]>([]);
+  const [buyers, setBuyers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -228,22 +229,29 @@ export default function BrowseApp() {
   const [isImageDragging, setIsImageDragging] = useState<boolean>(false);
   const imageTouchStartX = useRef<number | null>(null);
 
-  // Load listings from API
+  // Load listings or buyers from API
   useEffect(() => {
-    const loadListings = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const response = await api.getListings(browseType);
-        setListings(response.listings);
+        if (browseType === 'buyers') {
+          const response = await api.getBuyers();
+          setBuyers(response.buyers);
+          setListings([]);
+        } else {
+          const response = await api.getListings(browseType);
+          setListings(response.listings);
+          setBuyers([]);
+        }
       } catch (err: any) {
-        setError(err.message || "Failed to load listings");
+        setError(err.message || "Failed to load data");
       } finally {
         setLoading(false);
       }
     };
 
     if (location.pathname === '/') {
-      loadListings();
+      loadData();
     }
   }, [browseType, location.pathname]);
 
@@ -276,8 +284,9 @@ export default function BrowseApp() {
     });
   }, [listings, maxPrice, selectedNeighborhood, selectedVibes]);
 
-  // Current sublet being displayed
-  const currentSublet = filteredSublets[currentIndex];
+  // Current sublet being displayed (for sellers) or buyer (for buyers)
+  const currentSublet = browseType === 'sellers' ? filteredSublets[currentIndex] : null;
+  const currentBuyer = browseType === 'buyers' ? buyers[currentIndex] : null;
 
   // ----------------------------------------------------------------------------
   // VIBE OPTIONS - Extract all unique vibes from sample data
@@ -299,15 +308,46 @@ export default function BrowseApp() {
 
   const handlePass = () => {
     setShowEmail(false);
-    if (currentIndex < filteredSublets.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+    if (browseType === 'buyers') {
+      if (currentIndex < buyers.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else {
+        setCurrentIndex(buyers.length);
+      }
     } else {
-      setCurrentIndex(filteredSublets.length); // Show "no more" message
+      if (currentIndex < filteredSublets.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else {
+        setCurrentIndex(filteredSublets.length); // Show "no more" message
+      }
     }
   };
 
   const handleInterested = async () => {
-    if (currentSublet) {
+    if (browseType === 'buyers' && currentBuyer) {
+      // For buyers, create a match
+      try {
+        const result = await api.likeBuyer(currentBuyer.id);
+        
+        // Show match notification
+        if (result.matched) {
+          alert(`🎉 Match created! You can now chat with ${currentBuyer.name}. Check the Chat tab to start messaging!`);
+        }
+
+        // Show email
+        setShowEmail(true);
+        setTimeout(() => {
+          setShowEmail(false);
+          if (currentIndex < buyers.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+          } else {
+            setCurrentIndex(buyers.length);
+          }
+        }, 3000);
+      } catch (err: any) {
+        alert(err.message || "Failed to like buyer");
+      }
+    } else if (currentSublet) {
       try {
         // Like the listing via API
         const result = await api.likeListing(currentSublet._id);
@@ -319,8 +359,10 @@ export default function BrowseApp() {
 
         // Show match notification if matched
         if (result.matched) {
-          alert(`🎉 It's a match! You can now chat with ${(currentSublet.ownerId as any)?.name || 'them'}.`);
-          // Could navigate to matches page here
+          const ownerName = typeof currentSublet.ownerId === 'object' 
+            ? currentSublet.ownerId.name 
+            : 'them';
+          alert(`🎉 Match created! You can now chat with ${ownerName}. Check the Chat tab to start messaging!`);
         }
 
         // Show email
@@ -372,7 +414,7 @@ export default function BrowseApp() {
   // Keyboard shortcuts: Left = Pass, Right = Interested, Left/Right arrows for image navigation when holding Shift
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (location.pathname !== "/" || !currentSublet) return;
+      if (location.pathname !== "/" || (!currentSublet && !currentBuyer)) return;
 
       // Image navigation with Shift + Arrow keys
       if (
@@ -843,6 +885,193 @@ export default function BrowseApp() {
                     Retry
                   </button>
                 </div>
+              ) : browseType === 'buyers' && currentBuyer ? (
+                // BUYER PROFILE CARD
+                <div className="card-stack">
+                  {buyers[currentIndex + 1] && (
+                    <div
+                      className="profile-card behind"
+                      aria-hidden
+                      style={{
+                        transform: `scale(0.96) translateY(8px)`,
+                        opacity: 0.6,
+                      }}
+                    >
+                      <div className="card-image-container">
+                        {buyers[currentIndex + 1].profileImage ? (
+                          <img
+                            src={buyers[currentIndex + 1].profileImage}
+                            alt={buyers[currentIndex + 1].name}
+                            className="card-image"
+                            loading="lazy"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = "none";
+                              if (!img.nextElementSibling) {
+                                const placeholder = document.createElement("div");
+                                placeholder.className = "image-placeholder";
+                                placeholder.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                                placeholder.style.display = 'flex';
+                                placeholder.style.alignItems = 'center';
+                                placeholder.style.justifyContent = 'center';
+                                placeholder.style.fontSize = '4rem';
+                                placeholder.textContent = buyers[currentIndex + 1].name?.[0]?.toUpperCase() || '?';
+                                img.parentElement?.appendChild(placeholder);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="image-placeholder" style={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '4rem',
+                          }}>
+                            {buyers[currentIndex + 1].name?.[0]?.toUpperCase() || '?'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className={`profile-card ${swipeClass} ${
+                      isDragging ? "dragging" : ""
+                    }`}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                    onMouseDown={onMouseDown}
+                    style={{
+                      transform: isDragging
+                        ? `translateX(${dragX}px) rotate(${dragX / 25}deg)`
+                        : undefined,
+                      transition: isDragging
+                        ? "none"
+                        : "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}
+                  >
+                    {/* Swipe badges */}
+                    <div
+                      className={`swipe-badge pass ${
+                        isDragging && dragX < -20 ? "show" : ""
+                      }`}
+                      style={{ opacity: Math.min(Math.abs(dragX) / 100, 1) }}
+                    >
+                      PASS
+                    </div>
+                    <div
+                      className={`swipe-badge like ${
+                        isDragging && dragX > 20 ? "show" : ""
+                      }`}
+                      style={{ opacity: Math.min(Math.abs(dragX) / 100, 1) }}
+                    >
+                      LIKE
+                    </div>
+
+                    {/* Card counter */}
+                    {buyers.length > 0 && (
+                      <div className="card-counter">
+                        {currentIndex + 1} / {buyers.length}
+                      </div>
+                    )}
+
+                    {/* Profile Image */}
+                    <div className="card-image-container">
+                      {currentBuyer.profileImage ? (
+                        <img
+                          src={currentBuyer.profileImage}
+                          alt={currentBuyer.name}
+                          className="card-image"
+                          loading="lazy"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            img.style.display = "none";
+                            if (!img.nextElementSibling) {
+                              const placeholder = document.createElement("div");
+                              placeholder.className = "image-placeholder";
+                              placeholder.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                              placeholder.style.display = 'flex';
+                              placeholder.style.alignItems = 'center';
+                              placeholder.style.justifyContent = 'center';
+                              placeholder.style.fontSize = '6rem';
+                              placeholder.style.color = 'white';
+                              placeholder.style.fontWeight = '600';
+                              placeholder.textContent = currentBuyer.name?.[0]?.toUpperCase() || '?';
+                              img.parentElement?.appendChild(placeholder);
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div className="image-placeholder" style={{
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '6rem',
+                          color: 'white',
+                          fontWeight: '600',
+                        }}>
+                          {currentBuyer.name?.[0]?.toUpperCase() || '?'}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Buyer Profile Content */}
+                    <div className="card-content">
+                      <div className="card-header">
+                        <h2 className="card-title">{currentBuyer.name}</h2>
+                        <div className="card-price" style={{ color: '#007AFF' }}>
+                          Looking for a place
+                        </div>
+                      </div>
+
+                      {/* Preferences */}
+                      <div className="card-info">
+                        {currentBuyer.preferences && (
+                          <>
+                            <div className="info-row">
+                              <span className="info-label">Price Range</span>
+                              <span className="info-value">
+                                ${currentBuyer.preferences.priceRange?.min || 0} - ${currentBuyer.preferences.priceRange?.max || 2000}/month
+                              </span>
+                            </div>
+                            <div className="info-row">
+                              <span className="info-label">Roommates</span>
+                              <span className="info-value">
+                                {currentBuyer.preferences.numRoommates || 'Any'}
+                              </span>
+                            </div>
+                            {currentBuyer.preferences.preferredGenders && currentBuyer.preferences.preferredGenders.length > 0 && (
+                              <div className="info-row">
+                                <span className="info-label">Preferred Genders</span>
+                                <span className="info-value">
+                                  {currentBuyer.preferences.preferredGenders.join(', ')}
+                                </span>
+                              </div>
+                            )}
+                            {currentBuyer.preferences.preferredLocations && currentBuyer.preferences.preferredLocations.length > 0 && (
+                              <div className="info-row">
+                                <span className="info-label">Preferred Locations</span>
+                                <span className="info-value">
+                                  {currentBuyer.preferences.preferredLocations.join(', ')}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+
+                      {/* Contact reveal */}
+                      {showEmail && (
+                        <div className="email-reveal">
+                          ✉️ Contact: <strong>{currentBuyer.email}</strong>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               ) : currentSublet ? (
                 <div className="card-stack">
                   {/* Behind card preview */}
@@ -1065,11 +1294,21 @@ export default function BrowseApp() {
                     </div>
                   </div>
                 </div>
+              ) : browseType === 'buyers' && buyers.length === 0 ? (
+                <div className="no-more-message">
+                  <h2>No more buyers to browse!</h2>
+                  <p>
+                    Check back later for more buyers looking for places.
+                  </p>
+                  <button onClick={resetToStart} className="reset-btn">
+                    Start Over
+                  </button>
+                </div>
               ) : (
                 <div className="no-more-message">
-                  <h2>No more sublets match your filters!</h2>
+                  <h2>No more {browseType === 'sellers' ? 'listings' : 'buyers'} match your filters!</h2>
                   <p>
-                    Try adjusting your filters or check your saved listings.
+                    Try adjusting your filters or check back later.
                   </p>
                   <button onClick={resetToStart} className="reset-btn">
                     Start Over
@@ -1079,7 +1318,7 @@ export default function BrowseApp() {
             </main>
 
           {/* BOTTOM ACTION BAR */}
-          {currentSublet && (
+          {((browseType === 'sellers' && currentSublet) || (browseType === 'buyers' && currentBuyer)) && (
             <div className="bottom-action-bar">
               <button
                 className="action-button pass-button"

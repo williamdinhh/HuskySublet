@@ -29,6 +29,7 @@ const populateListing = async (listing) => {
       id: owner.id,
       name: owner.name,
       email: owner.email,
+      profileImage: owner.profileImage || null,
     } : listing.ownerId,
   };
 };
@@ -82,6 +83,83 @@ router.get('/browse', authenticate, async (req, res) => {
     listings = await Promise.all(listings.map(populateListing));
 
     res.json({ listings });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get buyers (for browse buyers tab)
+router.get('/buyers', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const data = await getDb();
+    
+    // Get all buyers (excluding current user)
+    const buyers = data.users.filter(u => 
+      u.role === 'buyer' && u.id !== userId
+    ).map(({ password, ...user }) => ({
+      ...user,
+      profileImage: user.profileImage || null, // Include profileImage if available
+    })); // Remove password
+    
+    res.json({ buyers });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Like a buyer (create match for testing)
+router.post('/buyers/:buyerId/like', authenticate, async (req, res) => {
+  try {
+    const buyerId = req.params.buyerId;
+    const userId = req.user.id;
+
+    if (buyerId === userId) {
+      return res.status(400).json({ error: 'Cannot like yourself' });
+    }
+
+    const buyer = await findUserById(buyerId);
+    if (!buyer || buyer.role !== 'buyer') {
+      return res.status(404).json({ error: 'Buyer not found' });
+    }
+
+    // For testing: Always create a match when someone likes a buyer
+    // Check if match already exists (we'll use a dummy listing ID for buyer matches)
+    const dummyListingId = `buyer-${buyerId}`;
+    let match = await findMatchByUsers([userId, buyerId], dummyListingId);
+    let matched = false;
+
+    if (!match) {
+      // Create new match with dummy listing
+      match = await createMatch({
+        users: [userId, buyerId],
+        listingId: dummyListingId,
+      });
+      matched = true;
+    } else {
+      matched = true;
+    }
+
+    // Populate match with user info
+    if (match) {
+      match = {
+        ...match,
+        _id: match.id, // Add _id for frontend compatibility
+        listingId: {
+          id: dummyListingId,
+          _id: dummyListingId,
+          title: `${buyer.name} is looking for a place`,
+          price: buyer.preferences?.priceRange?.max || 0,
+          neighborhood: buyer.preferences?.preferredLocations?.[0] || 'Any',
+        },
+        users: [
+          { id: req.user.id, name: req.user.name, email: req.user.email, profileImage: req.user.profileImage || null },
+          { id: buyer.id, name: buyer.name, email: buyer.email, profileImage: buyer.profileImage || null },
+        ],
+      };
+    }
+
+    res.json({ match, matched });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -207,33 +285,20 @@ router.post('/:id/like', authenticate, async (req, res) => {
     // Create like
     const like = await createLike({ userId, listingId });
 
-    // Check for mutual match: see if listing owner has liked any of this user's listings
-    const userListings = await findListings({ ownerId: userId, isActive: true });
-    const userListingIds = userListings.map(l => l.id);
-
+    // For testing: Always create a match when someone likes a listing
+    // Check if match already exists
+    let match = await findMatchByUsers([userId, listing.ownerId], listingId);
     let matched = false;
-    let match = null;
 
-    if (userListingIds.length > 0) {
-      // Check if owner has liked any of user's listings
-      for (const userListingId of userListingIds) {
-        const ownerLike = await findLike(listing.ownerId, userListingId);
-        if (ownerLike) {
-          // Mutual match!
-          const existingMatch = await findMatchByUsers([userId, listing.ownerId], listingId);
-          if (!existingMatch) {
-            match = await createMatch({
-              users: [userId, listing.ownerId],
-              listingId: listingId,
-            });
-            matched = true;
-          } else {
-            match = existingMatch;
-            matched = true;
-          }
-          break;
-        }
-      }
+    if (!match) {
+      // Create new match
+      match = await createMatch({
+        users: [userId, listing.ownerId],
+        listingId: listingId,
+      });
+      matched = true;
+    } else {
+      matched = true; // Match already exists
     }
 
     // Populate match with user info
@@ -242,10 +307,11 @@ router.post('/:id/like', authenticate, async (req, res) => {
       const owner = await findUserById(listing.ownerId);
       match = {
         ...match,
+        _id: match.id, // Add _id for frontend compatibility
         listingId: populated,
         users: [
-          { id: req.user.id, name: req.user.name, email: req.user.email },
-          owner ? { id: owner.id, name: owner.name, email: owner.email } : null,
+          { id: req.user.id, name: req.user.name, email: req.user.email, profileImage: req.user.profileImage || null },
+          owner ? { id: owner.id, name: owner.name, email: owner.email, profileImage: owner.profileImage || null } : null,
         ].filter(Boolean),
       };
     }
